@@ -4,6 +4,7 @@
 #include <QTcpSocket>
 #include "ui/connection-form.hpp"
 #include "ui/logs-form.hpp"
+#include "core/client.hpp"
 
 namespace Ui {
   class MainWindow;
@@ -17,14 +18,11 @@ class MainWindow : public QMainWindow
     ~MainWindow();
     void addLog(const QString & message);
   private slots:
-    void read();
-    void connect();
+    void onConnect();
     void onDisconnected();
   private:
-    void handleAnswer(QString answer);
-    void write(QString message);
     Ui::MainWindow *ui;
     LogsForm logsForm;
     ConnectionForm connectionForm;
-    QTcpSocket *tcpSocket;
+    Client client;
 };
