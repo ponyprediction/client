@@ -10,16 +10,19 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = client
 TEMPLATE = app
+QMAKE_CXXFLAGS += -std=c++11
 
 
 SOURCES += main.cpp\
         main-window.cpp \
     ui/connection-form.cpp \
-    ui/logs-form.cpp
+    ui/logs-form.cpp \
+    core/util.cpp
 
 HEADERS  += main-window.hpp \
     ui/connection-form.hpp \
-    ui/logs-form.hpp
+    ui/logs-form.hpp \
+    core/util.hpp
 
 FORMS    += main-window.ui \
     ui/connection-form.ui \

@@ -15,6 +15,7 @@ class MainWindow : public QMainWindow
   public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void addLog(const QString & message);
   private slots:
     void read();
     void connect();
