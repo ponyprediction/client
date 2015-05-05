@@ -19,10 +19,17 @@ class MainWindow : public QMainWindow
     void addLog(const QString & message);
   private slots:
     void onConnect();
+    void onConnected();
+    void onDisconnect();
     void onDisconnected();
+    void onLoginRefused();
+    void onLogged();
+    void onTest();
+    void onTest2();
   private:
     Ui::MainWindow *ui;
     LogsForm logsForm;
     ConnectionForm connectionForm;
     Client client;
+    bool isWorking;
 };
