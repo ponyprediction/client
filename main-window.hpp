@@ -2,6 +2,8 @@
 
 #include <QMainWindow>
 #include <QTcpSocket>
+#include "ui/connection-form.hpp"
+#include "ui/logs-form.hpp"
 
 namespace Ui {
   class MainWindow;
@@ -19,8 +21,9 @@ class MainWindow : public QMainWindow
     void onDisconnected();
   private:
     void handleAnswer(QString answer);
-    Ui::MainWindow *ui;
-    QTcpSocket *tcpSocket;
     void write(QString message);
-
+    Ui::MainWindow *ui;
+    LogsForm logsForm;
+    ConnectionForm connectionForm;
+    QTcpSocket *tcpSocket;
 };

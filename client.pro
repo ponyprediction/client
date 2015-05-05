@@ -13,8 +13,14 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        main-window.cpp
+        main-window.cpp \
+    ui/connection-form.cpp \
+    ui/logs-form.cpp
 
-HEADERS  += main-window.hpp
+HEADERS  += main-window.hpp \
+    ui/connection-form.hpp \
+    ui/logs-form.hpp
 
-FORMS    += main-window.ui
+FORMS    += main-window.ui \
+    ui/connection-form.ui \
+    ui/logs-form.ui

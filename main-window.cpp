@@ -1,14 +1,19 @@
 #include "main-window.hpp"
 #include "ui_main-window.h"
+#include "ui_connection-form.h"
 
 MainWindow::MainWindow(QWidget *parent) :
   QMainWindow(parent),
   ui(new Ui::MainWindow),
+  connectionForm(this),
+  logsForm(this),
   tcpSocket(new QTcpSocket(this))
 {
   // UI
   ui->setupUi(this);
-  QObject::connect(ui->buttonConnect, SIGNAL(clicked()),
+  ui->mainWidget->layout()->addWidget(&connectionForm);
+  ui->logsWidget->layout()->addWidget(&logsForm);
+  QObject::connect(connectionForm.ui->buttonConnect, SIGNAL(clicked()),
                    this, SLOT(connect()));
   QObject::connect(tcpSocket, SIGNAL(readyRead()),
                    this, SLOT(read()));
@@ -51,8 +56,8 @@ void MainWindow::handleAnswer(QString answer)
   if(answer == "hi")
   {
     write("log "
-          + ui->lineEditUsername->text()+ " "
-          + ui->lineEditPassword->text());
+          + connectionForm.ui->lineEditUsername->text()+ " "
+          + connectionForm.ui->lineEditPassword->text());
   }
   if(answer == "bye")
   {

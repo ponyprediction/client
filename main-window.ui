@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>638</width>
+    <height>423</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,16 +16,16 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout">
     <item row="0" column="0">
-     <widget class="QLineEdit" name="lineEditUsername"/>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLineEdit" name="lineEditPassword"/>
-    </item>
-    <item row="2" column="0">
-     <widget class="QPushButton" name="buttonConnect">
-      <property name="text">
-       <string>Connect</string>
+     <widget class="QSplitter" name="splitter">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
       </property>
+      <widget class="QWidget" name="mainWidget" native="true">
+       <layout class="QGridLayout" name="gridLayout_2"/>
+      </widget>
+      <widget class="QWidget" name="logsWidget" native="true">
+       <layout class="QGridLayout" name="gridLayout_3"/>
+      </widget>
      </widget>
     </item>
    </layout>
