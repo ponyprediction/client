@@ -25,48 +25,38 @@ void Client::connect()
 
 void Client::disconnect()
 {
-    write("exit");
+    handleRequest("exit");
 }
 
 void Client::log(QString username, QString password)
 {
-    write("log " + username + " " + password);
+    handleRequest("log " + username + " " + password);
+}
+
+void Client::askJob()
+{
+    handleRequest("getjob");
+}
+
+void Client::askBrain()
+{
+    handleRequest("getbrain");
+}
+
+void Client::sendBrain(QString brain)
+{
+    handleRequest("sendbrain " + brain);
+}
+
+void Client::handleRequest(QString request)
+{
+    write(request);
+    // Timer ?
 }
 
 void Client::onDisconnected()
 {
     emit disconnected();
-}
-
-void Client::read()
-{
-    QString answer = tcpSocket.readAll();
-    answer = answer.left(answer.size()-2);
-    Util::addLog("Answer  : " + answer);
-    handleAnswer(answer);
-}
-
-void Client::write(QString message)
-{
-    Util::addLog("Request : " + message);
-    message += "\r\n";
-    tcpSocket.write(message.toUtf8());
-}
-
-void Client::askJob()
-{
-    write("getjob");
-}
-
-void Client::askBrain()
-{
-    write("getbrain");
-}
-
-void Client::sendBrain(QString brain)
-{
-    QString request = "sendbrain " + brain;
-    write(request);
 }
 
 void Client::handleAnswer(QString answer)
@@ -89,11 +79,13 @@ void Client::handleAnswer(QString answer)
     }
     else if(answer.startsWith("job"))
     {
-        answer.remove(0,4);
-        QStringList strs = answer.split(' ');
-        int jobId = strs[0];
-        QString inputs = ef;
-        QString brain = ee;
+        // Parse data
+
+        // Create job
+        int id = 42;
+        QString problems = "bob";
+        QString bestBrain = "bob";
+        emit jobReceived(id, problems, bestBrain);
     }
     else if(answer == "bye")
     {
@@ -117,4 +109,19 @@ void Client::handleAnswer(QString answer)
     else
     {
     }
+}
+
+void Client::read()
+{
+    QString answer = tcpSocket.readAll();
+    answer = answer.left(answer.size()-2);
+    Util::addLog("Answer  : " + answer);
+    handleAnswer(answer);
+}
+
+void Client::write(QString message)
+{
+    Util::addLog("Request : " + message);
+    message += "\r\n";
+    tcpSocket.write(message.toUtf8());
 }

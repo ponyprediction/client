@@ -14,21 +14,29 @@ QMAKE_CXXFLAGS += -std=c++11
 
 
 SOURCES += main.cpp\
-        main-window.cpp \
+        ui/main-window.cpp \
     ui/connection-form.cpp \
     ui/logs-form.cpp \
     core/util.cpp \
     core/client.cpp \
-    core/job.cpp
+    core/job.cpp \
+    core/brain.cpp \
+    core/problem.cpp \
+    core/neuron.cpp \
+    core/neuron-blueprint.cpp
 
-HEADERS  += main-window.hpp \
+HEADERS  += ui/main-window.hpp \
     ui/connection-form.hpp \
     ui/logs-form.hpp \
     core/util.hpp \
     core/client.hpp \
-    core/job.hpp
+    core/job.hpp \
+    core/brain.hpp \
+    core/problem.hpp \
+    core/neuron.hpp \
+    core/neuron-blueprint.hpp
 
-FORMS    += main-window.ui \
+FORMS    += ui/main-window.ui \
     ui/connection-form.ui \
     ui/logs-form.ui
 

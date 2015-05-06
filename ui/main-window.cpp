@@ -3,6 +3,7 @@
 #include "ui_connection-form.h"
 #include "ui_logs-form.h"
 #include "core/util.hpp"
+#include <QFile>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -31,10 +32,27 @@ MainWindow::MainWindow(QWidget *parent) :
                      this, SLOT(onLogged()));
     QObject::connect(&client, SIGNAL(disconnected()),
                      this, SLOT(onDisconnected()));
+    QObject::connect(&client,
+                     SIGNAL(jobReceived(int,QString,QString)),
+                     this,
+                     SLOT(onJobReceived(int,QString,QString)));
     // Other
     QObject::connect(ui->buttonTest, SIGNAL(clicked()), this, SLOT(onTest()));
     QObject::connect(ui->buttonTest2, SIGNAL(clicked()), this, SLOT(onTest2()));
     addLog("UI ready");
+    //
+    QString problems;
+    QFile file("C:/Users/Loic/pony-prediction/problems/test.problems");
+    file.open(QFile::ReadOnly);
+    problems = file.readAll();
+    file.close();
+    QString bestBrain;
+    file.setFileName("C:/Users/Loic/pony-prediction/brains/test.brain");
+    file.open(QFile::ReadOnly);
+    bestBrain = file.readAll();
+    file.close();
+
+    onJobReceived(42, problems, bestBrain);
 }
 
 MainWindow::~MainWindow()
@@ -77,6 +95,18 @@ void MainWindow::onLogged()
     connectionForm.ui->buttonDisconnect->setVisible(true);
     if(!isWorking)
         client.askJob();
+}
+
+void MainWindow::onJobReceived(int id,
+                               QString problemsXml,
+                               QString bestBrainXml)
+{
+    int brainCount = 4;
+    int interval = 10;
+    //qDebug() << problemsXml;
+    //qDebug() << bestBrainXml;
+    job = Job(id, problemsXml, bestBrainXml, brainCount, interval);
+    //job.start();
 }
 
 void MainWindow::onDisconnect()

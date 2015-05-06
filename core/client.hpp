@@ -3,6 +3,8 @@
 
 #include <QString>
 #include <QTcpSocket>
+#include "core/problem.hpp"
+#include "core/brain.hpp"
 
 class Client : public QObject
 {
@@ -13,20 +15,27 @@ class Client : public QObject
         void connect();
         void disconnect();
         void log(QString username, QString password);
-        void write(QString message);
+
         void askJob();
         void askBrain();
         void sendBrain(QString brain);
-    private slots:
-        void read();
-        void onDisconnected();
+
+
     signals:
         void connectionEstablished();
         void loginRefused();
         void logged();
         void disconnected();
+        void jobReceived(int id,
+                         QString problems,
+                         QString bestBrain);
+    private slots:
+        void read();
+        void onDisconnected();
     private:
         void handleAnswer(QString answer);
+        void handleRequest(QString request);
+        void write(QString message);
         QString ip;
         int port;
         QTcpSocket tcpSocket;

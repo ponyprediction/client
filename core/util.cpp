@@ -1,5 +1,5 @@
 #include "util.hpp"
-#include "main-window.hpp"
+#include "ui/main-window.hpp"
 #include <QFile>
 #include <QDir>
 #include <QXmlStreamReader>
