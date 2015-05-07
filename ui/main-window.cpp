@@ -11,14 +11,19 @@ MainWindow::MainWindow(QWidget *parent) :
     connectionForm(this),
     logsForm(this),
     client(Util::getLineFromConf("ip"), Util::getLineFromConf("port").toInt()),
-    isWorking(false)
+    isWorking(false),
+    controlForm(this)
 {
     // UI
-    addLog("Starting up UI...");
     ui->setupUi(this);
+    QObject::connect(this,
+                     SIGNAL(newLog(QString)),
+                     logsForm.ui->plainTextEditLogs,
+                     SLOT(appendPlainText(QString)));
+    addLog("Starting up UI...");
     ui->mainWidget->layout()->addWidget(&connectionForm);
+    ui->mainWidget->layout()->addWidget(&controlForm);
     ui->logsWidget->layout()->addWidget(&logsForm);
-    connectionForm.ui->buttonDisconnect->setVisible(false);
     QObject::connect(connectionForm.ui->buttonConnect, SIGNAL(clicked()),
                      this, SLOT(onConnect()));
     QObject::connect(connectionForm.ui->buttonDisconnect, SIGNAL(clicked()),
@@ -62,7 +67,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::addLog(const QString & message)
 {
-    logsForm.ui->textEditLogs->append(message);
+    emit newLog(message);
 }
 
 void MainWindow::onConnect()
@@ -105,8 +110,8 @@ void MainWindow::onJobReceived(int id,
     int interval = 10;
     //qDebug() << problemsXml;
     //qDebug() << bestBrainXml;
-    job = Job(id, problemsXml, bestBrainXml, brainCount, interval);
-    //job.start();
+    job = new Job(id, problemsXml, bestBrainXml, brainCount, interval);
+    job->start();
 }
 
 void MainWindow::onDisconnect()

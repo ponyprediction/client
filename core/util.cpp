@@ -15,7 +15,9 @@ void Util::init(MainWindow * mainWindow)
 void Util::addLog(const QString & message)
 {
     if(mainWindow)
-        mainWindow->addLog(message);
+    {
+        emit mainWindow->newLog(message);
+    }
 }
 
 QString Util::getLineFromConf(const QString &id)
@@ -24,7 +26,8 @@ QString Util::getLineFromConf(const QString &id)
     QFile file(configFilePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qDebug() << "Can not find the conf file in : " + QDir::currentPath();
+        qDebug() << "Can not find the conf file at : "
+                    + QFileInfo(file).absoluteFilePath();
         return QString();
     }
     QXmlStreamReader xml(&file);
@@ -40,4 +43,18 @@ QString Util::getLineFromConf(const QString &id)
         }
     }
     return output;
+}
+float Util::getRandomFloat(const float &min, const float &max)
+{
+    return ((static_cast <float>(qrand()))
+            * (max - min)
+            / (static_cast<float>(RAND_MAX)))
+            + min;
+}
+int Util::getRandomInt(const int &min, const int &max)
+{
+    int r = getRandomFloat(min-1, max+1);
+    if(r < min || r > max)
+        r = getRandomInt(min, max);
+    return r;
 }

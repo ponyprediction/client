@@ -1,6 +1,7 @@
 #include "client.hpp"
 #include "util.hpp"
 #include <QFile>
+#include <QStringList>
 
 Client::Client(QString ip, int port) :
     ip(ip),
@@ -80,11 +81,12 @@ void Client::handleAnswer(QString answer)
     else if(answer.startsWith("job"))
     {
         // Parse data
-
+        answer.remove(0,4);
+        QStringList list = answer.split('|');
         // Create job
-        int id = 42;
-        QString problems = "bob";
-        QString bestBrain = "bob";
+        const int & id = list[0].toInt();
+        const QString & problems = list[1];
+        const QString & bestBrain = list[2];
         emit jobReceived(id, problems, bestBrain);
     }
     else if(answer == "bye")
@@ -108,6 +110,7 @@ void Client::handleAnswer(QString answer)
     }
     else
     {
+
     }
 }
 

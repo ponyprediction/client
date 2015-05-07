@@ -3,8 +3,10 @@
 #include <QStringList>
 #include <QDebug>
 #include "core/util.hpp"
+#include "core/job.hpp"
 
 Brain::Brain() :
+    QThread(),
     neuronCount(-1),
     inputCount(-1),
     weightCount(-1),
@@ -14,14 +16,22 @@ Brain::Brain() :
     neuronBlueprints(),
     inputs(),
     weights(),
-    outputs()
+    outputs(),
+    go(false),
+    currentProblemId(0),
+    id(-1),
+    attempts(0.0f),
+    score(0.0f),
+    ratio(0.0f)
 {
 
 }
 
-Brain::Brain(QXmlStreamReader & xmlReader) :
+Brain::Brain(Job * job, const int & id, QXmlStreamReader & xmlReader) :
     Brain()
 {
+    this->id = id;
+    this->job = job;
     load(xmlReader);
     initNeurons();
 }
@@ -33,7 +43,84 @@ Brain::~Brain()
 
 void Brain::start(QVector<Problem *> * problems)
 {
+    this->problems = problems;
+    QThread::start();
+}
 
+void Brain::run()
+{
+    go = true;
+    currentProblemId = 0;
+    while(go)
+    {
+        //
+        compute(problems->at(currentProblemId)->getInputs());
+        prepareResult();
+        learn(problems->at(currentProblemId)->getWantedOutput());
+        //
+        currentProblemId++;
+        currentProblemId%=problems->size();
+        if(!currentProblemId)
+        {
+            job->evaluate(this);
+        }
+    }
+}
+
+void Brain::compute(const QVector<float> & inputs)
+{
+    for(int i = 0 ; i < this->inputs.size() ; i++)
+        this->inputs[i] = 0.0f;
+    for(int i = 0 ; i < inputs.size() && i < this->inputs.size() ; i++)
+        this->inputs[i] = inputs[i];
+    for(int i = 0 ; i < neurons.size() ; i++)
+        neurons[i].compute();
+    for(int i = 0 ; i < outputCount ; i++)
+    {
+        int i2 = (neurons.size() - outputs.size()) + i;
+        outputs[i] = neurons[i2].getOutput();
+    }
+}
+
+void Brain::prepareResult()
+{
+    result = -1;
+    float ratioBest = -1.0f;
+    for(int i = 0 ; i < outputs.size() ; i++)
+    {
+        if(outputs[i] > ratioBest)
+        {
+            ratioBest = outputs[i];
+            result = i;
+        }
+    }
+    result -= 1; // result € [1 - 20]
+}
+
+void Brain::learn(const int & wantedResult)
+{
+    attempts++;
+    if(result == wantedResult)
+        score += 1.0f;
+    ratio = score / (float)attempts;
+}
+
+void Brain::mutate(float mutationFrequency, float mutationIntensity)
+{
+    for(int i = 0 ; i < weights.size() ; i++)
+    {
+        if(Util::getRandomFloat(0.0f, 1.0f) < mutationFrequency)
+        {
+            if(Util::getRandomFloat(-1.0f, 1.0f) > 0)
+                weights[i] += mutationIntensity;
+            else
+                weights[i] -= mutationIntensity;
+            if(weights[i] > 1.0f)
+                weights[i] = 1.0f;
+            if(weights[i] < -1.0f)
+                weights[i] = -1.0f;
+        }
+    }
 }
 
 void Brain::load(QXmlStreamReader & xmlReader)
@@ -119,7 +206,8 @@ void Brain::initNeurons()
             j < blueprint.neuronalInputIds.size() ;
             j++)
         {
-            float * a = neurons[blueprint.neuronalInputIds[j]].getOutputAdress();
+            float * a =
+                    neurons[blueprint.neuronalInputIds[j]].getOutputAdress();
             neurons[i].addNeuronalInput(a);
         }
         for(int j = 0 ;
@@ -131,3 +219,22 @@ void Brain::initNeurons()
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

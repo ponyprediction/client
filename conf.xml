@@ -2,4 +2,6 @@
 <conf>
     <ip>server.com</ip>
     <port>50000</port>
+    <mutationFrequency>0.0</mutationFrequency>
+    <mutationIntensity>0.0</mutationIntensity>
 </conf>

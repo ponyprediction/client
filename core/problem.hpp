@@ -10,6 +10,8 @@ class Problem
         Problem();
         Problem(QXmlStreamReader & xmlReader);
         ~Problem();
+        const QVector<float> & getInputs(){return inputs;}
+        const int & getWantedOutput(){return wantedOutputs[0];}
     private:
         void load(QXmlStreamReader & xmlReader);
         QVector<float> inputs;

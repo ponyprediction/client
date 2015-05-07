@@ -70,7 +70,7 @@ NeuronBlueprint::~NeuronBlueprint()
 
 /*void NeuronBlueprint::writeToXML(QXmlStreamWriter & xml)
 {
-    /*xml.writeStartElement("neuron");
+    xml.writeStartElement("neuron");
     {
         QString str1 = "";
         QString str2 = "";
