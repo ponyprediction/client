@@ -2,6 +2,7 @@
 
 #include <QMainWindow>
 #include <QTcpSocket>
+#include <QTimer>
 #include "ui/connection-form.hpp"
 #include "ui/logs-form.hpp"
 #include "core/client.hpp"
@@ -19,9 +20,11 @@ class MainWindow : public QMainWindow
         explicit MainWindow(QWidget *parent = 0);
         ~MainWindow();
 
+
     signals:
         void newLog(const QString & log);
     private slots:
+        void onRefresh();
         void onConnect();
         void onConnected();
         void onDisconnect();
@@ -33,8 +36,12 @@ class MainWindow : public QMainWindow
         void onJobReceived(int id,
                            QString problemsXml,
                            QString bestBrainXml);
+        void setMutationFrequencyAuto(bool value);
+        void setMutationFrequency(double value);
+        void setMutationIntensityAuto(bool value);
+        void setMutationIntensity(double value);
     private:
-    void addLog(const QString & message);
+        void addLog(const QString & message);
         Ui::MainWindow *ui;
         ConnectionForm connectionForm;
         LogsForm logsForm;
@@ -42,4 +49,5 @@ class MainWindow : public QMainWindow
         Client client;
         bool isWorking;
         Job * job;
+        QTimer timerRefresh;
 };

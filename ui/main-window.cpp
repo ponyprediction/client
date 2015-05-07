@@ -2,6 +2,7 @@
 #include "ui_main-window.h"
 #include "ui_connection-form.h"
 #include "ui_logs-form.h"
+#include "ui_control-form.h"
 #include "core/util.hpp"
 #include <QFile>
 
@@ -12,7 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     logsForm(this),
     client(Util::getLineFromConf("ip"), Util::getLineFromConf("port").toInt()),
     isWorking(false),
-    controlForm(this)
+    controlForm(this),
+    timerRefresh(this)
 {
     // UI
     ui->setupUi(this);
@@ -41,9 +43,30 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(jobReceived(int,QString,QString)),
                      this,
                      SLOT(onJobReceived(int,QString,QString)));
+    // Job
+    // Frequency
+    QObject::connect(controlForm.ui->radioButtonMutationFrequencyAuto,
+                     SIGNAL(clicked(bool)),
+                     this,
+                     SLOT(setMutationFrequencyAuto(bool)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationFrequency,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationFrequency(double)));
+    // Intensity
+    QObject::connect(controlForm.ui->radioButtonMutationIntensityAuto,
+                     SIGNAL(clicked(bool)),
+                     this,
+                     SLOT(setMutationIntensityAuto(bool)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationIntensity,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationIntensity(double)));
     // Other
     QObject::connect(ui->buttonTest, SIGNAL(clicked()), this, SLOT(onTest()));
     QObject::connect(ui->buttonTest2, SIGNAL(clicked()), this, SLOT(onTest2()));
+    QObject::connect(&timerRefresh, SIGNAL(timeout()), this, SLOT(onRefresh()));
+    timerRefresh.start(30);
     addLog("UI ready");
     //
     QString problems;
@@ -63,6 +86,16 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::onRefresh()
+{
+    // MutationFrequency
+    controlForm.ui->doubleSpinBoxMutationFrequency->setValue(
+                job->getMutationFrequency());
+    // MutationIntensity
+    controlForm.ui->doubleSpinBoxMutationIntensity->setValue(
+                job->getMutationIntensity());
 }
 
 void MainWindow::addLog(const QString & message)
@@ -108,12 +141,38 @@ void MainWindow::onJobReceived(int id,
 {
     int brainCount = 4;
     int interval = 10;
-    //qDebug() << problemsXml;
-    //qDebug() << bestBrainXml;
     job = new Job(id, problemsXml, bestBrainXml, brainCount, interval);
     job->start();
 }
-
+/******************************************************************************/
+void MainWindow::setMutationFrequencyAuto(bool value)
+{
+    job->setMutationFrequencyAuto(value);
+    controlForm.ui->widgetMutationFrequency->setEnabled(value);
+    controlForm.ui->doubleSpinBoxMutationFrequency->setEnabled(!value);
+    if(!value)
+        controlForm.ui->doubleSpinBoxMutationFrequency->setValue(
+                    job->getMutationFrequency());
+}
+void MainWindow::setMutationFrequency(double value)
+{
+    job->setMutationFrequency(value);
+}
+/******************************************************************************/
+void MainWindow::setMutationIntensityAuto(bool value)
+{
+    job->setMutationIntensityAuto(value);
+    controlForm.ui->widgetMutationIntensity->setEnabled(value);
+    controlForm.ui->doubleSpinBoxMutationIntensity->setEnabled(!value);
+    if(!value)
+        controlForm.ui->doubleSpinBoxMutationIntensity->setValue(
+                    job->getMutationIntensity());
+}
+void MainWindow::setMutationIntensity(double value)
+{
+    job->setMutationIntensity(value);
+}
+/******************************************************************************/
 void MainWindow::onDisconnect()
 {
     client.disconnect();

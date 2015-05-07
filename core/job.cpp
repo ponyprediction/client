@@ -4,7 +4,7 @@
 #include <QDebug>
 #include "util.hpp"
 
-Job::Job()
+Job::Job() : QObject()
 {
 
 }
@@ -14,6 +14,7 @@ Job::Job(const int & id,
          const QString & brainXml,
          const int & brainCount,
          const int & interval) :
+    QObject(),
     id(id),
     problems(),
     bestBrain(),
@@ -28,7 +29,17 @@ Job::Job(const int & id,
     mutexAverageRatio(),
     mutexBestBrain(),
     mutationFrequency(0.0f),
-    mutationIntensity(0.0f)
+    mutationFrequencyUp(0.0001),
+    mutationFrequencyDown(0.0002),
+    mutationFrequencyMax(1.0f),
+    mutationFrequencyMin(0.0001f),
+    mutationFrequencyAuto(false),
+    mutationIntensity(0.0f),
+    mutationIntensityUp(0.0001),
+    mutationIntensityDown(0.0002),
+    mutationIntensityMax(1.0f),
+    mutationIntensityMin(0.0001f),
+    mutationIntensityAuto(false)
 {
     loadProblems(problemsXml);
     loadBrains(brainXml);
@@ -116,36 +127,43 @@ void Job::updateAverageRatio()
     }
     averageRatio /= (float)lastNratios.size();
     float ratioResolution = 0.00001f;
-    float mutationFrequencyMax = 1.0f;
-    float mutationFrequencyMin = 0.0001f;
-    float mutationFrequencyUp =     0.0001f;
-    float mutationFrequencyDown =   0.0002f;
-    float mutationIntensityMax = 1.0f;
-    float mutationIntensityMin = 0.0001f;
-    float mutationIntensityUp =     0.0001f;
-    float mutationIntensityDown =   0.0002f;
+    float borne = 1000.0f;
     if(lastAverageRatio > averageRatio - ratioResolution)
     {
-        if(0 > Util::getRandomFloat(-100,100))
-            mutationFrequency  += mutationFrequencyUp;
-        else
-            mutationIntensity  += mutationIntensityUp;
+        if(mutationFrequencyAuto && mutationIntensityAuto)
+        {
+            if(0 > Util::getRandomFloat(-borne,borne))
+                upMutationFrequency();
+            else
+                upMutationIntenstity();
+        }
+        else if(mutationFrequencyAuto)
+        {
+            upMutationFrequency();
+        }
+        else if(mutationIntensityAuto)
+        {
+            upMutationIntenstity();
+        }
     }
     else
     {
-        if(0 > Util::getRandomFloat(-100,100))
-            mutationFrequency  -= mutationFrequencyDown;
-        else
-            mutationIntensity  -= mutationIntensityDown;
+        if(mutationFrequencyAuto && mutationIntensityAuto)
+        {
+            if(0 > Util::getRandomFloat(-borne,borne))
+                downMutationFrequency();
+            else
+                downMutationIntenstity();
+        }
+        else if(mutationFrequencyAuto)
+        {
+            downMutationFrequency();
+        }
+        else if(mutationIntensityAuto)
+        {
+            downMutationIntenstity();
+        }
     }
-    if(mutationFrequency > mutationFrequencyMax)
-        mutationFrequency = mutationFrequencyMax;
-    if(mutationFrequency < mutationFrequencyMin)
-        mutationFrequency = mutationFrequencyMin;
-    if(mutationIntensity > mutationIntensityMax)
-        mutationIntensity = mutationIntensityMax;
-    if(mutationIntensity < mutationIntensityMin)
-        mutationIntensity = mutationIntensityMin;
     mutexLastNratios.unlock();
     mutexAverageRatio.unlock();
 }
@@ -187,4 +205,32 @@ void Job::copyFromBestBrain(Brain * brain)
     brain->ratio = 0;
     mutexBestBrain.unlock();
     brain->initNeurons();
+}
+
+void Job::upMutationFrequency()
+{
+    mutationFrequency  += mutationFrequencyUp;
+    if(mutationFrequency > mutationFrequencyMax)
+        mutationFrequency = mutationFrequencyMax;
+}
+
+void Job::downMutationFrequency()
+{
+    mutationFrequency  -= mutationFrequencyDown;
+    if(mutationFrequency < mutationFrequencyMin)
+        mutationFrequency = mutationFrequencyMin;
+}
+
+void Job::upMutationIntenstity()
+{
+    mutationIntensity  += mutationIntensityUp;
+    if(mutationIntensity > mutationIntensityMax)
+        mutationIntensity = mutationIntensityMax;
+}
+
+void Job::downMutationIntenstity()
+{
+    mutationIntensity  -= mutationIntensityDown;
+    if(mutationIntensity < mutationIntensityMin)
+        mutationIntensity = mutationIntensityMin;
 }

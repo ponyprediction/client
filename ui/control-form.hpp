@@ -9,6 +9,7 @@ namespace Ui {
 
 class ControlForm : public QWidget
 {
+        friend class MainWindow;
         Q_OBJECT
 
     public:
