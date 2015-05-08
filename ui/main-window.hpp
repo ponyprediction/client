@@ -38,8 +38,16 @@ class MainWindow : public QMainWindow
                            QString bestBrainXml);
         void setMutationFrequencyAuto(bool value);
         void setMutationFrequency(double value);
+        void setMutationFrequencyDown(double value);
+        void setMutationFrequencyUp(double value);
+        void setMutationFrequencyMax(double value);
+        void setMutationFrequencyMin(double value);
         void setMutationIntensityAuto(bool value);
         void setMutationIntensity(double value);
+        void setMutationIntensityDown(double value);
+        void setMutationIntensityUp(double value);
+        void setMutationIntensityMax(double value);
+        void setMutationIntensityMin(double value);
     private:
         void addLog(const QString & message);
         Ui::MainWindow *ui;

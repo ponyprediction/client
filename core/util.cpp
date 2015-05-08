@@ -42,6 +42,11 @@ QString Util::getLineFromConf(const QString &id)
             }
         }
     }
+    if(!output.size())
+    {
+        Util::addLog("Can not find '" + id + "' in conf file.");
+        qDebug() << "Can not find '" + id + "' in conf file.";
+    }
     return output;
 }
 float Util::getRandomFloat(const float &min, const float &max)

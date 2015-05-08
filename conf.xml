@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <conf>
-    <ip>server.com</ip>
+    <ip>localhost</ip>
     <port>50000</port>
-    <mutationFrequency>0.0f</mutationFrequency>
-    <mutationIntensity>0.0f</mutationIntensity>
+
     <decimals>6</decimals>
     <step>0.000001</step>
+
+    <mutationFrequency>0.0</mutationFrequency>
+    <mutationFrequencyUp>0.0001</mutationFrequencyUp>
+    <mutationFrequencyDown>0.0002</mutationFrequencyDown>
+    <mutationFrequencyMin>0.0</mutationFrequencyMin>
+    <mutationFrequencyMax>1.0</mutationFrequencyMax>
+    <mutationFrequencyAuto>1</mutationFrequencyAuto>
+
+    <mutationIntensity>0.0</mutationIntensity>
+    <mutationIntensityUp>0.0001</mutationIntensityUp>
+    <mutationIntensityDown>0.0002</mutationIntensityDown>
+    <mutationIntensityMin>0.0</mutationIntensityMin>
+    <mutationIntensityMax>1.0</mutationIntensityMax>
+    <mutationIntensityAuto>1</mutationIntensityAuto>
+
 </conf>

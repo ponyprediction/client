@@ -53,6 +53,22 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(valueChanged(double)),
                      this,
                      SLOT(setMutationFrequency(double)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationFrequencyUp,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationFrequencyUp(double)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationFrequencyDown,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationFrequencyDown(double)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationFrequencyMin,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationFrequencyMin(double)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationFrequencyMax,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationFrequencyMax(double)));
     // Intensity
     QObject::connect(controlForm.ui->radioButtonMutationIntensityAuto,
                      SIGNAL(clicked(bool)),
@@ -62,15 +78,31 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(valueChanged(double)),
                      this,
                      SLOT(setMutationIntensity(double)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationIntensityUp,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationIntensityUp(double)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationIntensityDown,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationIntensityDown(double)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationIntensityMin,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationIntensityMin(double)));
+    QObject::connect(controlForm.ui->doubleSpinBoxMutationIntensityMax,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setMutationIntensityMax(double)));
     // Other
-    QObject::connect(ui->buttonTest, SIGNAL(clicked()), this, SLOT(onTest()));
-    QObject::connect(ui->buttonTest2, SIGNAL(clicked()), this, SLOT(onTest2()));
+    //QObject::connect(ui->buttonTest, SIGNAL(clicked()), this, SLOT(onTest()));
+    //QObject::connect(ui->buttonTest2, SIGNAL(clicked()), this, SLOT(onTest2()));
     QObject::connect(&timerRefresh, SIGNAL(timeout()), this, SLOT(onRefresh()));
     timerRefresh.start(30);
     addLog("UI ready");
     //
     QString problems;
-    QFile file("C:/Users/Loic/pony-prediction/problems/test.problems");
+    QFile file("C:/Users/Loic/pony-prediction/problems/1mois.problems");
     file.open(QFile::ReadOnly);
     problems = file.readAll();
     file.close();
@@ -90,12 +122,28 @@ MainWindow::~MainWindow()
 
 void MainWindow::onRefresh()
 {
-    // MutationFrequency
+    // Frequency
     controlForm.ui->doubleSpinBoxMutationFrequency->setValue(
                 job->getMutationFrequency());
-    // MutationIntensity
+    controlForm.ui->doubleSpinBoxMutationFrequencyDown->setValue(
+                job->getMutationFrequencyDown());
+    controlForm.ui->doubleSpinBoxMutationFrequencyUp->setValue(
+                job->getMutationFrequencyUp());
+    controlForm.ui->doubleSpinBoxMutationFrequencyMin->setValue(
+                job->getMutationFrequencyMin());
+    controlForm.ui->doubleSpinBoxMutationFrequencyMax->setValue(
+                job->getMutationFrequencyMax());
+    // Intensity
     controlForm.ui->doubleSpinBoxMutationIntensity->setValue(
                 job->getMutationIntensity());
+    controlForm.ui->doubleSpinBoxMutationIntensityDown->setValue(
+                job->getMutationIntensityDown());
+    controlForm.ui->doubleSpinBoxMutationIntensityUp->setValue(
+                job->getMutationIntensityUp());
+    controlForm.ui->doubleSpinBoxMutationIntensityMin->setValue(
+                job->getMutationIntensityMin());
+    controlForm.ui->doubleSpinBoxMutationIntensityMax->setValue(
+                job->getMutationIntensityMax());
 }
 
 void MainWindow::addLog(const QString & message)
@@ -142,13 +190,16 @@ void MainWindow::onJobReceived(int id,
     int brainCount = 4;
     int interval = 10;
     job = new Job(id, problemsXml, bestBrainXml, brainCount, interval);
+
+    QObject::connect(ui->buttonTest, SIGNAL(clicked()), job, SLOT(test()));
+
     job->start();
 }
 /******************************************************************************/
 void MainWindow::setMutationFrequencyAuto(bool value)
 {
     job->setMutationFrequencyAuto(value);
-    controlForm.ui->widgetMutationFrequency->setEnabled(value);
+    //controlForm.ui->widgetMutationFrequency->setEnabled(value);
     controlForm.ui->doubleSpinBoxMutationFrequency->setEnabled(!value);
     if(!value)
         controlForm.ui->doubleSpinBoxMutationFrequency->setValue(
@@ -158,11 +209,27 @@ void MainWindow::setMutationFrequency(double value)
 {
     job->setMutationFrequency(value);
 }
+void MainWindow::setMutationFrequencyDown(double value)
+{
+    job->setMutationFrequencyDown(value);
+}
+void MainWindow::setMutationFrequencyUp(double value)
+{
+    job->setMutationFrequencyUp(value);
+}
+void MainWindow::setMutationFrequencyMax(double value)
+{
+    job->setMutationFrequencyMax(value);
+}
+void MainWindow::setMutationFrequencyMin(double value)
+{
+    job->setMutationFrequencyMin(value);
+}
 /******************************************************************************/
 void MainWindow::setMutationIntensityAuto(bool value)
 {
     job->setMutationIntensityAuto(value);
-    controlForm.ui->widgetMutationIntensity->setEnabled(value);
+    //controlForm.ui->widgetMutationIntensity->setEnabled(value);
     controlForm.ui->doubleSpinBoxMutationIntensity->setEnabled(!value);
     if(!value)
         controlForm.ui->doubleSpinBoxMutationIntensity->setValue(
@@ -171,6 +238,22 @@ void MainWindow::setMutationIntensityAuto(bool value)
 void MainWindow::setMutationIntensity(double value)
 {
     job->setMutationIntensity(value);
+}
+void MainWindow::setMutationIntensityDown(double value)
+{
+    job->setMutationIntensityDown(value);
+}
+void MainWindow::setMutationIntensityUp(double value)
+{
+    job->setMutationIntensityUp(value);
+}
+void MainWindow::setMutationIntensityMax(double value)
+{
+    job->setMutationIntensityMax(value);
+}
+void MainWindow::setMutationIntensityMin(double value)
+{
+    job->setMutationIntensityMin(value);
 }
 /******************************************************************************/
 void MainWindow::onDisconnect()

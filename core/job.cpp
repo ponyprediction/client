@@ -1,9 +1,8 @@
 #include "job.hpp"
-
 #include <QXmlStreamReader>
 #include <QDebug>
 #include "util.hpp"
-
+/******************************************************************************/
 Job::Job() : QObject()
 {
 
@@ -28,28 +27,30 @@ Job::Job(const int & id,
     mutexLastNratios(),
     mutexAverageRatio(),
     mutexBestBrain(),
-    mutationFrequency(0.0f),
-    mutationFrequencyUp(0.0001),
-    mutationFrequencyDown(0.0002),
-    mutationFrequencyMax(1.0f),
-    mutationFrequencyMin(0.0001f),
-    mutationFrequencyAuto(false),
-    mutationIntensity(0.0f),
-    mutationIntensityUp(0.0001),
-    mutationIntensityDown(0.0002),
-    mutationIntensityMax(1.0f),
-    mutationIntensityMin(0.0001f),
-    mutationIntensityAuto(false)
+    mutationFrequency(Util::getLineFromConf("mutationFrequency").toFloat()),
+    mutationFrequencyUp(Util::getLineFromConf("mutationFrequencyUp").toFloat()),
+    mutationFrequencyDown(Util::getLineFromConf("mutationFrequencyDown").toFloat()),
+    mutationFrequencyMax(Util::getLineFromConf("mutationFrequencyMax").toFloat()),
+    mutationFrequencyMin(Util::getLineFromConf("mutationFrequencyMin").toFloat()),
+    mutationFrequencyAuto(Util::getLineFromConf("mutationFrequencyAuto").toInt()),
+    mutationIntensity(Util::getLineFromConf("mutationIntensity").toFloat()),
+    mutationIntensityUp(Util::getLineFromConf("mutationIntensityUp").toFloat()),
+    mutationIntensityDown(Util::getLineFromConf("mutationIntensityDown").toFloat()),
+    mutationIntensityMax(Util::getLineFromConf("mutationIntensityMax").toFloat()),
+    mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat()),
+    mutationIntensityAuto(Util::getLineFromConf("mutationIntensityAuto").toInt())
 {
     loadProblems(problemsXml);
     loadBrains(brainXml);
+    setMutationFrequency(mutationFrequency);
+    setMutationIntensity(mutationIntensity);
 }
 
 Job::~Job()
 {
 
 }
-
+/******************************************************************************/
 void Job::start()
 {
     for(int i = 0 ; i < brainCount ; i++)
@@ -89,22 +90,86 @@ void Job::evaluate(Brain * brain)
     mutexAverageRatio.lock();
     float averagetmp = averageRatio;
     mutexAverageRatio.unlock();
-    Util::addLog("Brain #" + QString::number(brain->getId())
-                 + " : " + QString::number(brain->getRatio(), 'f', 6)
-                 + " : " + QString::number(averagetmp, 'f', 6)
-                 + " : " + QString::number(mutationFrequency, 'f', 6)
-                 + " : " + QString::number(mutationIntensity, 'f', 6));
     if(brain->getRatio() > averagetmp)
     {
+        Util::addLog("Brain #" + QString::number(brain->getId())
+                     + " : " + QString::number(brain->getRatio(), 'f', 6)
+                     + " : " + QString::number(averagetmp, 'f', 6)
+                     + " : " + QString::number(mutationFrequency, 'f', 6)
+                     + " : " + QString::number(mutationIntensity, 'f', 6));
         copyToBestBrain(brain);
     }
-    else
-    {
-        copyFromBestBrain(brain);
-    }
+    copyFromBestBrain(brain);
     brain->mutate(mutationFrequency,mutationIntensity);
 }
+/******************************************************************************/
+void Job::setMutationFrequency(float v)
+{
+    mutationFrequency = v;
+    if(mutationFrequency < mutationFrequencyMin)
+    {
+        mutationFrequency = mutationFrequencyMin;
+    }
+    if(mutationFrequency > mutationFrequencyMax)
+    {
+        mutationFrequency = mutationFrequencyMax;
+    }
+}
 
+void Job::setMutationFrequencyMin(float v)
+{
+    mutationFrequencyMin = v;
+    if(mutationFrequencyMin > mutationFrequencyMax)
+    {
+        mutationFrequencyMin = mutationFrequencyMax;
+    }
+}
+
+void Job::setMutationFrequencyMax(float v)
+{
+    mutationFrequencyMax = v;
+    if(mutationFrequencyMax < mutationFrequencyMin)
+    {
+        mutationFrequencyMax = mutationFrequencyMin;
+    }
+}
+/******************************************************************************/
+void Job::setMutationIntensity(float v)
+{
+    mutationIntensity = v;
+    if(mutationIntensity < mutationIntensityMin)
+    {
+        mutationIntensity = mutationIntensityMin;
+    }
+    if(mutationIntensity > mutationIntensityMax)
+    {
+        mutationIntensity = mutationIntensityMax;
+    }
+}
+
+void Job::setMutationIntensityMin(float v)
+{
+    mutationIntensityMin = v;
+    if(mutationIntensityMin > mutationIntensityMax)
+    {
+        mutationIntensityMin = mutationIntensityMax;
+    }
+}
+
+void Job::setMutationIntensityMax(float v)
+{
+    mutationIntensityMax = v;
+    if(mutationIntensityMax < mutationIntensityMin)
+    {
+        mutationIntensityMax = mutationIntensityMin;
+    }
+}
+
+void Job::test()
+{
+    qDebug() << "test";
+}
+/******************************************************************************/
 void Job::addRatio(const float & ratio)
 {
     mutexLastNratios.lock();
@@ -167,10 +232,7 @@ void Job::updateAverageRatio()
     mutexLastNratios.unlock();
     mutexAverageRatio.unlock();
 }
-
-
-
-
+/******************************************************************************/
 void Job::copyToBestBrain(Brain * brain)
 {
     mutexBestBrain.lock();
@@ -206,7 +268,7 @@ void Job::copyFromBestBrain(Brain * brain)
     mutexBestBrain.unlock();
     brain->initNeurons();
 }
-
+/******************************************************************************/
 void Job::upMutationFrequency()
 {
     mutationFrequency  += mutationFrequencyUp;
