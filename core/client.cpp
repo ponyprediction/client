@@ -96,9 +96,9 @@ void Client::handleAnswer(QString answer)
     }
     else if(answer.startsWith("brain"))
     {
-        QString brainXML = answer.remove(0,6);
+        QString brainJson = answer.remove(0,6);
         QByteArray aa;
-        aa.append(brainXML);
+        aa.append(brainJson);
         QFile file("./test.brain");
         file.open(QIODevice::ReadWrite);
         file.write(aa);

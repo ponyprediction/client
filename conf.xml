@@ -21,4 +21,7 @@
     <mutationIntensityMax>1.0</mutationIntensityMax>
     <mutationIntensityAuto>1</mutationIntensityAuto>
 
+    <problemsFilename>/home/loic/ponyprediction/json/jobs/2014-01-01--2014-01-31--2014-01-01.json</problemsFilename>
+    <brainFilename>/home/loic/ponyprediction/brains/bob.brain</brainFilename>
+
 </conf>

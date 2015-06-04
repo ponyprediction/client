@@ -9,9 +9,9 @@ Problem::Problem()
 
 }
 
-Problem::Problem(QXmlStreamReader & xmlReader)
+Problem::Problem(const QJsonObject & json, const int & inputCount)
 {
-    load(xmlReader);
+    load(json, inputCount);
 }
 
 Problem::~Problem()
@@ -19,30 +19,25 @@ Problem::~Problem()
 
 }
 
-void Problem::load(QXmlStreamReader & xmlReader)
+void Problem::load(const QJsonObject & json, const int & inputCount)
 {
-    while (!xmlReader.atEnd()
-           && !(xmlReader.name() == "problem"
-                && xmlReader.tokenType() == QXmlStreamReader::EndElement))
+    inputs.clear();
+    wantedOutputs.clear();
+    //
+    QStringList inputsList = json["inputs"].toString().split(';');
+    for(int i = 0 ; i < inputsList.size() ; i++)
     {
-        QXmlStreamReader::TokenType token = xmlReader.readNext();
-        if(token == QXmlStreamReader::StartElement)
-        {
-            if(xmlReader.name() == "inputs")
-            {
-                QString str = xmlReader.readElementText();
-                QStringList list = str.split(';');
-                for(int i = 0 ; i < list.size() ; i++)
-                    inputs.push_back(list[i].toFloat());
-            }
-            if(xmlReader.name() == "wantedOutputs")
-            {
-                QString str = xmlReader.readElementText();
-                QStringList list = str.split(';');
-                for(int i = 0 ; i < list.size() ; i++)
-                    wantedOutputs.push_back(list[i].toInt());
-            }
-        }
+        inputs.push_back(inputsList[i].toFloat());
+    }
+    for(int i = inputs.size() ; i < inputCount ; i++)
+    {
+        inputs.push_back(0.0);
+    }
+    //
+    QStringList wantedOutputsList = json["wantedOutputs"].toString().split(';');
+    for(int i = 0 ; i < wantedOutputsList.size() ; i++)
+    {
+        wantedOutputs.push_back(wantedOutputsList[i].toInt());
     }
 }
 

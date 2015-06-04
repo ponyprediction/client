@@ -6,6 +6,7 @@
 #include "core/util.hpp"
 #include <QFile>
 
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
@@ -94,20 +95,18 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(valueChanged(double)),
                      this,
                      SLOT(setMutationIntensityMax(double)));
+    addLog("UI ready");
     // Other
-    //QObject::connect(ui->buttonTest, SIGNAL(clicked()), this, SLOT(onTest()));
-    //QObject::connect(ui->buttonTest2, SIGNAL(clicked()), this, SLOT(onTest2()));
     QObject::connect(&timerRefresh, SIGNAL(timeout()), this, SLOT(onRefresh()));
     timerRefresh.start(30);
-    addLog("UI ready");
     //
     QString problems;
-    QFile file("C:/Users/Loic/pony-prediction/problems/1mois.problems");
+    QFile file(Util::getLineFromConf("problemsFilename"));
     file.open(QFile::ReadOnly);
     problems = file.readAll();
     file.close();
     QString bestBrain;
-    file.setFileName("C:/Users/Loic/pony-prediction/brains/test.brain");
+    file.setFileName(Util::getLineFromConf("brainFilename"));
     file.open(QFile::ReadOnly);
     bestBrain = file.readAll();
     file.close();
@@ -115,10 +114,12 @@ MainWindow::MainWindow(QWidget *parent) :
     onJobReceived(42, problems, bestBrain);
 }
 
+
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
 
 void MainWindow::onRefresh()
 {
@@ -146,10 +147,12 @@ void MainWindow::onRefresh()
                 job->getMutationIntensityMax());
 }
 
+
 void MainWindow::addLog(const QString & message)
 {
     emit newLog(message);
 }
+
 
 void MainWindow::onConnect()
 {
@@ -159,11 +162,13 @@ void MainWindow::onConnect()
     connectionForm.ui->buttonConnect->setEnabled(false);
 }
 
+
 void MainWindow::onConnected()
 {
     client.log(connectionForm.ui->lineEditUsername->text(),
                connectionForm.ui->lineEditPassword->text());
 }
+
 
 void MainWindow::onLoginRefused()
 {
@@ -175,6 +180,7 @@ void MainWindow::onLoginRefused()
     client.disconnect();
 }
 
+
 void MainWindow::onLogged()
 {
     connectionForm.ui->buttonConnect->setVisible(false);
@@ -183,19 +189,18 @@ void MainWindow::onLogged()
         client.askJob();
 }
 
+
 void MainWindow::onJobReceived(int id,
-                               QString problemsXml,
-                               QString bestBrainXml)
+                               QString problemsJson,
+                               QString bestBrainJson)
 {
     int brainCount = 4;
     int interval = 10;
-    job = new Job(id, problemsXml, bestBrainXml, brainCount, interval);
-
-    QObject::connect(ui->buttonTest, SIGNAL(clicked()), job, SLOT(test()));
-
+    job = new Job(id, problemsJson, bestBrainJson, brainCount, interval);
     job->start();
 }
-/******************************************************************************/
+
+
 void MainWindow::setMutationFrequencyAuto(bool value)
 {
     job->setMutationFrequencyAuto(value);
@@ -225,7 +230,8 @@ void MainWindow::setMutationFrequencyMin(double value)
 {
     job->setMutationFrequencyMin(value);
 }
-/******************************************************************************/
+
+
 void MainWindow::setMutationIntensityAuto(bool value)
 {
     job->setMutationIntensityAuto(value);
@@ -255,11 +261,13 @@ void MainWindow::setMutationIntensityMin(double value)
 {
     job->setMutationIntensityMin(value);
 }
-/******************************************************************************/
+
+
 void MainWindow::onDisconnect()
 {
     client.disconnect();
 }
+
 
 void MainWindow::onDisconnected()
 {
@@ -268,14 +276,4 @@ void MainWindow::onDisconnected()
     connectionForm.ui->lineEditUsername->setEnabled(true);
     connectionForm.ui->lineEditPassword->setEnabled(true);
     connectionForm.ui->buttonConnect->setEnabled(true);
-}
-
-void MainWindow::onTest()
-{
-    client.sendBrain("<brain>lol c'est pas un brain, je suis un hacker</brain");
-}
-
-void MainWindow::onTest2()
-{
-    client.askBrain();
 }

@@ -31,11 +31,9 @@ class MainWindow : public QMainWindow
         void onDisconnected();
         void onLoginRefused();
         void onLogged();
-        void onTest();
-        void onTest2();
         void onJobReceived(int id,
-                           QString problemsXml,
-                           QString bestBrainXml);
+                           QString problemsJson,
+                           QString bestBrainJson);
         void setMutationFrequencyAuto(bool value);
         void setMutationFrequency(double value);
         void setMutationFrequencyDown(double value);

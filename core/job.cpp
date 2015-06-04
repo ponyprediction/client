@@ -1,16 +1,21 @@
 #include "job.hpp"
 #include <QXmlStreamReader>
 #include <QDebug>
+#include <QString>
 #include "util.hpp"
-/******************************************************************************/
+
+
+int inputCount = 80;
+
+
 Job::Job() : QObject()
 {
 
 }
 
 Job::Job(const int & id,
-         const QString & problemsXml,
-         const QString & brainXml,
+         const QString & problemsJson,
+         const QString & brainJson,
          const int & brainCount,
          const int & interval) :
     QObject(),
@@ -40,8 +45,8 @@ Job::Job(const int & id,
     mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat()),
     mutationIntensityAuto(Util::getLineFromConf("mutationIntensityAuto").toInt())
 {
-    loadProblems(problemsXml);
-    loadBrains(brainXml);
+    loadProblems(problemsJson);
+    loadBrains(brainJson);
     setMutationFrequency(mutationFrequency);
     setMutationIntensity(mutationIntensity);
 }
@@ -50,38 +55,38 @@ Job::~Job()
 {
 
 }
-/******************************************************************************/
+
+
 void Job::start()
 {
-    for(int i = 0 ; i < brainCount ; i++)
+    for(int i = 0 ; i < brains.size() ; i++)
         brains[i]->start(&problems);
 }
 
-void Job::loadProblems(const QString & problemsXml)
+
+void Job::loadProblems(const QString & problemsJson)
 {
     problems.clear();
-    QXmlStreamReader xmlReader(problemsXml);
-    while (!xmlReader.atEnd())
+    QJsonDocument json = QJsonDocument::fromJson(problemsJson.toUtf8());
+    QJsonArray problemsJsonArray = json.object()["problems"].toArray();
+
+
+
+    for(int i = 0 ; i < problemsJsonArray.size() ; i++)
     {
-        QXmlStreamReader::TokenType token = xmlReader.readNext();
-        if(token == QXmlStreamReader::StartElement)
-        {
-            if(xmlReader.name() == "problem")
-            {
-                problems.push_back(new Problem(xmlReader));
-            }
-        }
+        problems.push_back(new Problem(
+                               problemsJsonArray[i].toObject(), inputCount));
     }
 }
 
-void Job::loadBrains(const QString & brainXml)
+void Job::loadBrains(const QString & brainJson)
 {
     brains.clear();
-    for(int i = 0 ; i < brainCount ; i++)
+    /*for(int i = 0 ; i < brainCount ; i++)
     {
-        QXmlStreamReader xmlReader(brainXml);
+        QXmlStreamReader xmlReader(brainJson);
         brains.push_back(new Brain(this, i+1, xmlReader));
-    }
+    }*/
 }
 
 void Job::evaluate(Brain * brain)
@@ -165,11 +170,7 @@ void Job::setMutationIntensityMax(float v)
     }
 }
 
-void Job::test()
-{
-    qDebug() << "test";
-}
-/******************************************************************************/
+
 void Job::addRatio(const float & ratio)
 {
     mutexLastNratios.lock();
@@ -179,6 +180,7 @@ void Job::addRatio(const float & ratio)
     mutexLastNratios.unlock();
     updateAverageRatio();
 }
+
 
 void Job::updateAverageRatio()
 {
@@ -232,7 +234,8 @@ void Job::updateAverageRatio()
     mutexLastNratios.unlock();
     mutexAverageRatio.unlock();
 }
-/******************************************************************************/
+
+
 void Job::copyToBestBrain(Brain * brain)
 {
     mutexBestBrain.lock();
@@ -251,6 +254,7 @@ void Job::copyToBestBrain(Brain * brain)
     mutexBestBrain.unlock();
 }
 
+
 void Job::copyFromBestBrain(Brain * brain)
 {
     mutexBestBrain.lock();
@@ -268,13 +272,15 @@ void Job::copyFromBestBrain(Brain * brain)
     mutexBestBrain.unlock();
     brain->initNeurons();
 }
-/******************************************************************************/
+
+
 void Job::upMutationFrequency()
 {
     mutationFrequency  += mutationFrequencyUp;
     if(mutationFrequency > mutationFrequencyMax)
         mutationFrequency = mutationFrequencyMax;
 }
+
 
 void Job::downMutationFrequency()
 {
@@ -289,6 +295,7 @@ void Job::upMutationIntenstity()
     if(mutationIntensity > mutationIntensityMax)
         mutationIntensity = mutationIntensityMax;
 }
+
 
 void Job::downMutationIntenstity()
 {

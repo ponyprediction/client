@@ -3,6 +3,9 @@
 #include <QVector>
 #include <QMutex>
 #include <QDebug>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
 #include "brain.hpp"
 #include "core/problem.hpp"
 
@@ -13,8 +16,8 @@ class Job : public QObject
 
         Job();
         Job(const int & id,
-            const QString & problemsXml,
-            const QString & brainXml,
+            const QString & problemsJson,
+            const QString & brainJson,
             const int & brainCount,
             const int & interval);
         ~Job();
@@ -45,14 +48,10 @@ class Job : public QObject
         float getMutationIntensityMin(){return mutationIntensityMin;}
         float getMutationIntensityMax(){return mutationIntensityMax;}
 
-    public slots:
-
-        void test();
-
     private:
 
-        void loadProblems(const QString & problemsXml);
-        void loadBrains(const QString & brainXml);
+        void loadProblems(const QString & problemsJson);
+        void loadBrains(const QString & brainJson);
         void addRatio(const float & ratio);
         void updateAverageRatio();
         void copyToBestBrain(Brain * brain);
