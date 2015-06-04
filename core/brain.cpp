@@ -27,12 +27,12 @@ Brain::Brain() :
 
 }
 
-Brain::Brain(Job * job, const int & id, QXmlStreamReader & xmlReader) :
+Brain::Brain(Job * job, const int & id, const QJsonObject & json) :
     Brain()
 {
     this->id = id;
     this->job = job;
-    load(xmlReader);
+    load(json);
     initNeurons();
 }
 
@@ -123,63 +123,43 @@ void Brain::mutate(float mutationFrequency, float mutationIntensity)
     }
 }
 
-void Brain::load(QXmlStreamReader & xmlReader)
+void Brain::load(const QJsonObject & json)
 {
-    while (!xmlReader.atEnd()
-           && !(xmlReader.name() == "brain"
-                && xmlReader.tokenType() == QXmlStreamReader::EndElement))
+    //qDebug() << json;
+    // neuronCount
+    neuronCount = json["neuronCount"].toInt();
+    neuronBlueprints.clear();
+    neurons = QVector<Neuron>(neuronCount, Neuron());
+    // inputCount
+    inputCount = json["inputCount"].toInt();
+    inputs = QVector<float>(inputCount, 0.0f);
+    // weightCount
+    weightCount = json["weightCount"].toInt();
+    weights = QVector<float>(weightCount, 0.0f);
+    // weights
+    QString weightsStr = json["weights"].toString();
+    QStringList weightsStrList = weightsStr.split(';');
+    if(weightsStrList.size() == weightCount)
     {
-        QXmlStreamReader::TokenType token = xmlReader.readNext();
-        if(token == QXmlStreamReader::StartElement)
+        weights = QVector<float>(weightCount, 0.0f);
+        for(int i = 0 ; i < weightCount ; i++)
         {
-            if(xmlReader.name() == "neuronCount")
-            {
-                neuronCount = xmlReader.readElementText().toInt();
-                neuronBlueprints.clear();
-                neurons = QVector<Neuron>(neuronCount, Neuron());
-            }
-            if(xmlReader.name() == "inputCount")
-            {
-                inputCount = xmlReader.readElementText().toInt();
-                inputs = QVector<float>(inputCount, 0.0f);
-            }
-            if(xmlReader.name() == "weightCount")
-            {
-                weightCount = xmlReader.readElementText().toInt();
-                weights = QVector<float>(weightCount, 0.0f);
-            }
-            if(xmlReader.name() == "weights")
-            {
-                QString weightsStr = xmlReader.readElementText();
-                QStringList weightsStrList = weightsStr.split(';');
-                if(weightsStrList.size() == weightCount)
-                {
-                    weights = QVector<float>(weightCount, 0.0f);
-                    for(int i = 0 ; i < weightCount ; i++)
-                    {
-                        weights[i] = weightsStrList[i].toFloat();
-                    }
-                }
-                else
-                {
-                    Util::addLog("Problem loading weights : "
-                                 "the count ain't right");
-                }
-            }
-            if(xmlReader.name() == "outputCount")
-            {
-                outputCount = xmlReader.readElementText().toInt();
-                outputs = QVector<float>(outputCount, 0.0f);
-            }
-            if(xmlReader.name() == "neuron")
-            {
-                neuronBlueprints.push_back(NeuronBlueprint(xmlReader));
-            }
-            if(xmlReader.name() == "jobId")
-            {
-                jobId = xmlReader.readElementText().toInt();
-            }
+            weights[i] = weightsStrList[i].toFloat();
         }
+    }
+    else
+    {
+        qDebug() << "Problem loading weights : "
+                    "the count ain't right";
+    }
+    // outputCount
+    outputCount = json["outputCount"].toInt();
+    outputs = QVector<float>(outputCount, 0.0f);
+    // neurons
+    QJsonArray neurarr = json["neurons"].toArray();
+    for(int i = 0 ; i < neurarr.size() ; i++)
+    {
+        neuronBlueprints.push_back(NeuronBlueprint(neurarr[i].toObject()));
     }
 }
 

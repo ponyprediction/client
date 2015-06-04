@@ -6,59 +6,51 @@ NeuronBlueprint::NeuronBlueprint()
 
 }
 
-NeuronBlueprint::NeuronBlueprint(QXmlStreamReader & xmlReader)
+NeuronBlueprint::NeuronBlueprint(const QJsonObject & json)
 {
     externalInputIds.clear();
     neuronalInputIds.clear();
     brainalInputIds.clear();
     weightIds.clear();
-    while(!xmlReader.atEnd()
-          && !(xmlReader.name() == "neuron"
-               && xmlReader.tokenType() == QXmlStreamReader::EndElement))
+    // externalInputIds
+    //qDebug() << json;
     {
-        QXmlStreamReader::TokenType token = xmlReader.readNext();
-        if(token == QXmlStreamReader::StartElement) // Attributs x 5
+        QString str = json["externalInputIds"].toString();
+        if(str.size())
         {
-            if(xmlReader.name() == "externalInputIds")
-            {
-                QString str = xmlReader.readElementText();
-                if(str.size())
-                {
-                    QStringList strList = str.split(';');
-                    for(int i = 0 ; i < strList.size() ; i++)
-                        addExternalInputId(strList[i].toInt());
-                }
-            }
-            if(xmlReader.name() == "neuronalInputIds")
-            {
-                QString str = xmlReader.readElementText();
-                if(str.size())
-                {
-                    QStringList strList = str.split(';');
-                    for(int i = 0 ; i < strList.size() ; i++)
-                        addNeuronalInputId(strList[i].toInt());
-                }
-            }
-            if(xmlReader.name() == "brainalInputIds")
-            {
-                QString str = xmlReader.readElementText();
-                if(str.size())
-                {
-                    QStringList strList = str.split(';');
-                    for(int i = 0 ; i < strList.size() ; i++)
-                        addBrainalInputId(strList[i].toInt());
-                }
-            }
-            if(xmlReader.name() == "weightIds")
-            {
-                QString str = xmlReader.readElementText();
-                if(str.size())
-                {
-                    QStringList strList = str.split(';');
-                    for(int i = 0 ; i < strList.size() ; i++)
-                        addWeightId(strList[i].toInt());
-                }
-            }
+            QStringList strList = str.split(';');
+            for(int i = 0 ; i < strList.size() ; i++)
+                addExternalInputId(strList[i].toInt());
+        }
+    }
+    // neuronalInputIds
+    {
+        QString str = json["neuronalInputIds"].toString();
+        if(str.size())
+        {
+            QStringList strList = str.split(';');
+            for(int i = 0 ; i < strList.size() ; i++)
+                addNeuronalInputId(strList[i].toInt());
+        }
+    }
+    // brainalInputIds
+    {
+        QString str = json["brainalInputIds"].toString();
+        if(str.size())
+        {
+            QStringList strList = str.split(';');
+            for(int i = 0 ; i < strList.size() ; i++)
+                addBrainalInputId(strList[i].toInt());
+        }
+    }
+    // weightIds
+    {
+        QString str = json["weightIds"].toString();
+        if(str.size())
+        {
+            QStringList strList = str.split(';');
+            for(int i = 0 ; i < strList.size() ; i++)
+                addWeightId(strList[i].toInt());
         }
     }
 }

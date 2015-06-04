@@ -15,7 +15,7 @@ class Brain : public QThread
         Q_OBJECT
     public:
         Brain();
-        Brain(Job * job, const int & id, QXmlStreamReader & xmlReader);
+        Brain(Job * job, const int & id, const QJsonObject & json);
         ~Brain();
         void start(QVector<Problem*> * problems);
         const float & getRatio(){return ratio;}
@@ -27,7 +27,7 @@ class Brain : public QThread
         void learn(const int & wantedResult);
         void autoEvaluate();
         void run();
-        void load(QXmlStreamReader & xmlReader);
+        void load(const QJsonObject & json);
         void initNeurons();
         Job * job;
         int neuronCount;

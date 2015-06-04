@@ -69,9 +69,6 @@ void Job::loadProblems(const QString & problemsJson)
     problems.clear();
     QJsonDocument json = QJsonDocument::fromJson(problemsJson.toUtf8());
     QJsonArray problemsJsonArray = json.object()["problems"].toArray();
-
-
-
     for(int i = 0 ; i < problemsJsonArray.size() ; i++)
     {
         problems.push_back(new Problem(
@@ -82,11 +79,12 @@ void Job::loadProblems(const QString & problemsJson)
 void Job::loadBrains(const QString & brainJson)
 {
     brains.clear();
-    /*for(int i = 0 ; i < brainCount ; i++)
+    QJsonDocument json = QJsonDocument::fromJson(brainJson.toUtf8());
+    for(int i = 0 ; i < brainCount ; i++)
     {
-        QXmlStreamReader xmlReader(brainJson);
-        brains.push_back(new Brain(this, i+1, xmlReader));
-    }*/
+        brains.push_back(new Brain(this, i+1, json.object()));
+    }
+    copyToBestBrain(brains[0]);
 }
 
 void Job::evaluate(Brain * brain)
@@ -95,13 +93,13 @@ void Job::evaluate(Brain * brain)
     mutexAverageRatio.lock();
     float averagetmp = averageRatio;
     mutexAverageRatio.unlock();
+    Util::addLog("Brain #" + QString::number(brain->getId())
+                 + " : " + QString::number(brain->getRatio(), 'f', 6)
+                 + " : " + QString::number(averagetmp, 'f', 6)
+                 + " : " + QString::number(mutationFrequency, 'f', 6)
+                 + " : " + QString::number(mutationIntensity, 'f', 6));
     if(brain->getRatio() > averagetmp)
     {
-        Util::addLog("Brain #" + QString::number(brain->getId())
-                     + " : " + QString::number(brain->getRatio(), 'f', 6)
-                     + " : " + QString::number(averagetmp, 'f', 6)
-                     + " : " + QString::number(mutationFrequency, 'f', 6)
-                     + " : " + QString::number(mutationIntensity, 'f', 6));
         copyToBestBrain(brain);
     }
     copyFromBestBrain(brain);

@@ -3,12 +3,13 @@
 #include <QVector>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
+#include <QJsonObject>
 
 class NeuronBlueprint
 {
   public:
     NeuronBlueprint();
-    NeuronBlueprint(QXmlStreamReader & xmlReader);
+    NeuronBlueprint(const QJsonObject & json);
     ~NeuronBlueprint();
 
     void addExternalInputId(const int & inputId){

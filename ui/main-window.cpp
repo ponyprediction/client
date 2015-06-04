@@ -194,7 +194,7 @@ void MainWindow::onJobReceived(int id,
                                QString problemsJson,
                                QString bestBrainJson)
 {
-    int brainCount = 4;
+    int brainCount = Util::getLineFromConf("brainCount").toInt();
     int interval = 10;
     job = new Job(id, problemsJson, bestBrainJson, brainCount, interval);
     job->start();
