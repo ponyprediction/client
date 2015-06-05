@@ -65,8 +65,6 @@ void Job::start()
 
 void Job::loadProblems(const QString & trainingSetJson)
 {
-
-    qDebug() << "loadProblems";
     //
     bool ok =true;
     QJsonDocument json;
@@ -262,6 +260,11 @@ void Job::setMutationIntensityMax(float v)
     {
         mutationIntensityMax = mutationIntensityMin;
     }
+}
+
+QString Job::getBestBrain()
+{
+    return bestBrain.getJson();
 }
 
 

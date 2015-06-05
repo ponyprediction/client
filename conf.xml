@@ -28,4 +28,6 @@
 
     <pathToBrains>/home/loic/ponyprediction/brains</pathToBrains>
 
+    <intervalSendBrain>2000</intervalSendBrain>
+
 </conf>

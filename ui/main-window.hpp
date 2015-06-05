@@ -58,6 +58,8 @@ private slots:
                        QString problemsJson,
                        QString bestBrainJson);
 
+    void sendBrain();
+
 private:
 
     void addLog(const QString & message);
@@ -77,4 +79,5 @@ private:
     bool isWorking;
     Job * job;
     QTimer timerRefresh;
+    QTimer timerSendBrain;
 };

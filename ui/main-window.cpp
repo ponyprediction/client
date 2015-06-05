@@ -18,7 +18,8 @@ MainWindow::MainWindow(QWidget *parent) :
     isWorking(false),
     controlForm(this),
     localForm(this),
-    timerRefresh(this)
+    timerRefresh(this),
+    timerSendBrain(this)
 {
     // UI
     ui->setupUi(this);
@@ -55,9 +56,9 @@ MainWindow::MainWindow(QWidget *parent) :
                      this,
                      SLOT(trainLocally()));
     QObject::connect(localForm.ui->buttonLocalSolving,
-                         SIGNAL(clicked()),
-                         this,
-                         SLOT(solveLocally()));
+                     SIGNAL(clicked()),
+                     this,
+                     SLOT(solveLocally()));
     // Training
     QObject::connect(controlForm.ui->buttonSave,
                      SIGNAL(clicked()),
@@ -115,6 +116,8 @@ MainWindow::MainWindow(QWidget *parent) :
                      SLOT(setMutationIntensityMax(double)));
     //
     QObject::connect(&timerRefresh, SIGNAL(timeout()), this, SLOT(onRefresh()));
+    QObject::connect(&timerSendBrain, SIGNAL(timeout()),
+                     this, SLOT(sendBrain()));
     addLog("UI ready");
 }
 
@@ -218,7 +221,7 @@ void MainWindow::startTraining(int id,
 
 void MainWindow::solve(QString problemsJson, QString brainJson)
 {
-   Util::addLog(Job::getPrediction(problemsJson, brainJson));
+    Util::addLog(Job::getPrediction(problemsJson, brainJson));
 }
 
 
@@ -333,7 +336,12 @@ void MainWindow::onJobReceived(int id,
                                QString bestBrainJson)
 {
     startTraining(id, problemsJson, bestBrainJson);
-    //startCheckSendBrain();
+    timerSendBrain.start(Util::getLineFromConf("intervalSendBrain").toInt());
+}
+
+void MainWindow::sendBrain()
+{
+   client.sendBrain(job->getBestBrain());
 }
 
 

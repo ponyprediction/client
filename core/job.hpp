@@ -51,6 +51,8 @@ public:
     float getMutationIntensityMin(){return mutationIntensityMin;}
     float getMutationIntensityMax(){return mutationIntensityMax;}
 
+    QString getBestBrain();
+
 private:
 
     void loadProblems(const QString & trainingSetJson);
