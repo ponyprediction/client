@@ -65,13 +65,38 @@ void Job::start()
 
 void Job::loadProblems(const QString & problemsJson)
 {
-    problems.clear();
-    QJsonDocument json = QJsonDocument::fromJson(problemsJson.toUtf8());
-    QJsonArray problemsJsonArray = json.object()["problems"].toArray();
-    for(int i = 0 ; i < problemsJsonArray.size() ; i++)
+
+    qDebug() << "loadProblems";
+    //
+    bool ok =true;
+    QJsonDocument json;
+    QJsonArray problemsJsonArray;
+    //
+    if(ok)
     {
-        problems.push_back(new Problem(
-                               problemsJsonArray[i].toObject(), inputCount));
+        json = QJsonDocument::fromJson(problemsJson.toUtf8());
+        if(json.isEmpty())
+        {
+            ok = false;
+            qDebug() << "pb";
+        }
+        qDebug() << problemsJson;
+    }
+    if(ok)
+    {
+        problemsJsonArray = json.object()["problems"].toArray();
+    }
+    if(ok)
+    {
+        problems.clear();
+        for(int i = 0 ; i < problemsJsonArray.size() ; i++)
+        {
+            problems.push_back(new Problem(
+                                   problemsJsonArray[i].toObject(), inputCount));
+        }
+        //qDebug() << json;
+        //qDebug() << json.object()["problems"].toArray();
+        //qDebug() << problems.size();
     }
 }
 

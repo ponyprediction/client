@@ -16,7 +16,7 @@ public:
     void disconnect();
     void log(QString username, QString password);
 
-    void askJob();
+    void askProblems();
     void askBrain();
     void sendBrain(QString brain);
 
@@ -39,6 +39,14 @@ private:
     QString ip;
     int port;
     QTcpSocket tcpSocket;
+
+    QString jobJson;
+    QString brainJson;
+
+    bool jobIsSet;
+    bool brainIsSet;
+
+    QString currentAnswer;
 };
 
 #endif // CLIENT_HPP

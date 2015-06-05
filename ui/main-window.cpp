@@ -27,8 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
                      logsForm.ui->plainTextEditLogs,
                      SLOT(appendPlainText(QString)));
     addLog("Starting up UI...");
-    connectionForm.setVisible(false);
     controlForm.setVisible(false);
+    ui->mainWidget->layout()->addWidget(&connectionForm);
     ui->mainWidget->layout()->addWidget(&localForm);
     ui->logsWidget->layout()->addWidget(&logsForm);
     //
@@ -187,7 +187,10 @@ void MainWindow::onLogged()
     connectionForm.ui->buttonConnect->setVisible(false);
     connectionForm.ui->buttonDisconnect->setVisible(true);
     if(!isWorking)
-        client.askJob();
+    {
+        client.askProblems();
+        client.askBrain();
+    }
 }
 
 
@@ -195,10 +198,13 @@ void MainWindow::startTraining(int id,
                                QString problemsJson,
                                QString bestBrainJson)
 {
+    connectionForm.setVisible(false);
+    ui->mainWidget->layout()->removeWidget(&connectionForm);
     localForm.setVisible(false);
     ui->mainWidget->layout()->removeWidget(&localForm);
     controlForm.setVisible(true);
     ui->mainWidget->layout()->addWidget(&controlForm);
+    //
     int brainCount = Util::getLineFromConf("brainCount").toInt();
     job = new Job(id, problemsJson, bestBrainJson, brainCount);
     job->start();
@@ -293,6 +299,19 @@ void MainWindow::saveBrain()
                 Util::getLineFromConf("pathToBrains") + "/default.brain",
                 "Brain (*.brain)");
     job->saveBestBrain(fileName);
+}
+
+
+void MainWindow::onJobReceived(int id,
+                               QString problemsJson,
+                               QString bestBrainJson)
+{
+
+
+    //qDebug() << problemsJson;
+
+    startTraining(id, problemsJson, bestBrainJson);
+    //startCheckSendBrain();
 }
 
 

@@ -180,6 +180,7 @@ void Brain::load(const QJsonObject & json)
     {
         qDebug() << "Problem loading weights : "
                     "the count ain't right";
+        qDebug() << weightsStrList.size() << weightCount;
     }
     // outputCount
     outputCount = json["outputCount"].toInt();

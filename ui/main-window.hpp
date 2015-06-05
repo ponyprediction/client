@@ -53,12 +53,16 @@ private slots:
     void trainLocally();
     void saveBrain();
 
+    void onJobReceived(int id,
+                       QString problemsJson,
+                       QString bestBrainJson);
+
 private:
 
     void addLog(const QString & message);
     void startTraining(int id,
-                  QString problemsJson,
-                  QString bestBrainJson);
+                       QString problemsJson,
+                       QString bestBrainJson);
 
     Ui::MainWindow * ui;
     ConnectionForm connectionForm;
