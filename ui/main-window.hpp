@@ -51,6 +51,7 @@ private slots:
     void setMutationIntensityMin(double value);
 
     void trainLocally();
+    void solveLocally();
     void saveBrain();
 
     void onJobReceived(int id,
@@ -61,8 +62,11 @@ private:
 
     void addLog(const QString & message);
     void startTraining(int id,
-                       QString problemsJson,
+                       QString trainingSetJson,
                        QString bestBrainJson);
+
+    void solve(QString problemsJson,
+               QString brainJson);
 
     Ui::MainWindow * ui;
     ConnectionForm connectionForm;

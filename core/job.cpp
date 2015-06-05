@@ -15,7 +15,7 @@ Job::Job() : QObject()
 }
 
 Job::Job(const int & id,
-         const QString & problemsJson,
+         const QString & trainingSetJson,
          const QString & brainJson,
          const int & brainCount) :
     QObject(),
@@ -44,7 +44,7 @@ Job::Job(const int & id,
     mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat()),
     mutationIntensityAuto(Util::getLineFromConf("mutationIntensityAuto").toInt())
 {
-    loadProblems(problemsJson);
+    loadProblems(trainingSetJson);
     loadBrains(brainJson);
     setMutationFrequency(mutationFrequency);
     setMutationIntensity(mutationIntensity);
@@ -63,7 +63,7 @@ void Job::start()
 }
 
 
-void Job::loadProblems(const QString & problemsJson)
+void Job::loadProblems(const QString & trainingSetJson)
 {
 
     qDebug() << "loadProblems";
@@ -74,13 +74,12 @@ void Job::loadProblems(const QString & problemsJson)
     //
     if(ok)
     {
-        json = QJsonDocument::fromJson(problemsJson.toUtf8());
+        json = QJsonDocument::fromJson(trainingSetJson.toUtf8());
         if(json.isEmpty())
         {
             ok = false;
             qDebug() << "pb";
         }
-        qDebug() << problemsJson;
     }
     if(ok)
     {
@@ -94,9 +93,6 @@ void Job::loadProblems(const QString & problemsJson)
             problems.push_back(new Problem(
                                    problemsJsonArray[i].toObject(), inputCount));
         }
-        //qDebug() << json;
-        //qDebug() << json.object()["problems"].toArray();
-        //qDebug() << problems.size();
     }
 }
 
@@ -155,6 +151,53 @@ void Job::saveBestBrain(const QString & fileName)
         file.write(bestBrain.getJson().toUtf8());
         mutexBestBrain.unlock();
     }
+}
+
+
+QString Job::getPrediction(QString problemsJson, QString brainJson)
+{
+    bool ok =true;
+    QJsonDocument json;
+    QJsonArray problemsJsonArray;
+    QVector<Problem*> problems;
+    // Brain
+    Brain brain(nullptr, 0,
+                QJsonDocument::fromJson(brainJson.toUtf8()).object());
+    // Problems
+    if(ok)
+    {
+        json = QJsonDocument::fromJson(problemsJson.toUtf8());
+        if(json.isEmpty())
+        {
+            ok = false;
+            qDebug() << "pb";
+        }
+    }
+    if(ok)
+    {
+        problemsJsonArray = json.object()["problems"].toArray();
+    }
+    if(ok)
+    {
+        problems.clear();
+        for(int i = 0 ; i < problemsJsonArray.size() ; i++)
+        {
+            problems.push_back(new Problem(problemsJsonArray[i].toObject(),
+                                           inputCount));
+        }
+    }
+    // Compute
+    QString a = "{ ";
+    for(int i = 0 ; i < problems.size() ; i++)
+    {
+        if(i)
+        {
+            a += " ; ";
+        }
+        a += (brain.getPrediction(problems[i]->getInputs()));
+    }
+    a += " }";
+    return a;
 }
 
 

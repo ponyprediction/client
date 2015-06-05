@@ -92,10 +92,10 @@ void Brain::prepareResult()
         if(outputs[i] > ratioBest)
         {
             ratioBest = outputs[i];
-            result = i;
+            result = i-1;
         }
     }
-    result -= 1; // result € [1 - 20]
+    //result -= 1; // result € [1 - 20]
 }
 
 void Brain::learn(const int & wantedResult)
@@ -148,6 +148,13 @@ QString Brain::getJson()
     }
     //
     return str;
+}
+
+QString Brain::getPrediction(const QVector<float> & inputs)
+{
+    compute(inputs);
+    prepareResult();
+    return QString::number(result);
 }
 
 

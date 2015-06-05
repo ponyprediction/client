@@ -28,6 +28,8 @@ public:
     void mutate(float mutationFrequency, float mutationIntensity);
     QString getJson();
 
+    QString getPrediction(const QVector<float> & inputs);
+
 private:
 
     void compute(const QVector<float> & inputs);

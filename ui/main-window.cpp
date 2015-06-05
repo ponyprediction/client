@@ -54,6 +54,10 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(clicked()),
                      this,
                      SLOT(trainLocally()));
+    QObject::connect(localForm.ui->buttonLocalSolving,
+                         SIGNAL(clicked()),
+                         this,
+                         SLOT(solveLocally()));
     // Training
     QObject::connect(controlForm.ui->buttonSave,
                      SIGNAL(clicked()),
@@ -195,7 +199,7 @@ void MainWindow::onLogged()
 
 
 void MainWindow::startTraining(int id,
-                               QString problemsJson,
+                               QString trainingSetJson,
                                QString bestBrainJson)
 {
     connectionForm.setVisible(false);
@@ -206,9 +210,15 @@ void MainWindow::startTraining(int id,
     ui->mainWidget->layout()->addWidget(&controlForm);
     //
     int brainCount = Util::getLineFromConf("brainCount").toInt();
-    job = new Job(id, problemsJson, bestBrainJson, brainCount);
+    job = new Job(id, trainingSetJson, bestBrainJson, brainCount);
     job->start();
     timerRefresh.start(30);
+}
+
+
+void MainWindow::solve(QString problemsJson, QString brainJson)
+{
+   Util::addLog(Job::getPrediction(problemsJson, brainJson));
 }
 
 
@@ -278,17 +288,33 @@ void MainWindow::setMutationIntensityMin(double value)
 
 void MainWindow::trainLocally()
 {
-    QString problems;
+    QString trainingSet;
     QFile file(Util::getLineFromConf("problemsFilename"));
     file.open(QFile::ReadOnly);
-    problems = file.readAll();
+    trainingSet = file.readAll();
     file.close();
     QString bestBrain;
     file.setFileName(Util::getLineFromConf("brainFilename"));
     file.open(QFile::ReadOnly);
     bestBrain = file.readAll();
     file.close();
-    startTraining(42, problems, bestBrain);
+    startTraining(42, trainingSet, bestBrain);
+}
+
+
+void MainWindow::solveLocally()
+{
+    QString problems;
+    QFile file(Util::getLineFromConf("problemsFilename"));
+    file.open(QFile::ReadOnly);
+    problems = file.readAll();
+    file.close();
+    QString brain;
+    file.setFileName(Util::getLineFromConf("brainFilename"));
+    file.open(QFile::ReadOnly);
+    brain = file.readAll();
+    file.close();
+    solve(problems, brain);
 }
 
 
@@ -306,10 +332,6 @@ void MainWindow::onJobReceived(int id,
                                QString problemsJson,
                                QString bestBrainJson)
 {
-
-
-    //qDebug() << problemsJson;
-
     startTraining(id, problemsJson, bestBrainJson);
     //startCheckSendBrain();
 }
