@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     core/problem.cpp \
     core/neuron.cpp \
     core/neuron-blueprint.cpp \
-    ui/control-form.cpp
+    ui/control-form.cpp \
+    ui/local-form.cpp
 
 HEADERS  += ui/main-window.hpp \
     ui/connection-form.hpp \
@@ -36,12 +37,14 @@ HEADERS  += ui/main-window.hpp \
     core/problem.hpp \
     core/neuron.hpp \
     core/neuron-blueprint.hpp \
-    ui/control-form.hpp
+    ui/control-form.hpp \
+    ui/local-form.hpp
 
 FORMS    += ui/main-window.ui \
     ui/connection-form.ui \
     ui/logs-form.ui \
-    ui/control-form.ui
+    ui/control-form.ui \
+    ui/local-form.ui
 
 DISTFILES += \
     conf.xml

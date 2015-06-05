@@ -1,8 +1,9 @@
 #include "job.hpp"
-#include <QXmlStreamReader>
-#include <QDebug>
-#include <QString>
 #include "util.hpp"
+#include <QDebug>
+#include <QFile>
+#include <QFileInfo>
+#include <QString>
 
 
 int inputCount = 80;
@@ -16,15 +17,13 @@ Job::Job() : QObject()
 Job::Job(const int & id,
          const QString & problemsJson,
          const QString & brainJson,
-         const int & brainCount,
-         const int & interval) :
+         const int & brainCount) :
     QObject(),
     id(id),
     problems(),
     bestBrain(),
     brains(),
     brainCount(brainCount),
-    interval(interval),
     ratiosToSaveCount(100),
     lastNratios(QVector<float>(100, 0.0f)),
     averageRatio(0.0f),
@@ -76,6 +75,7 @@ void Job::loadProblems(const QString & problemsJson)
     }
 }
 
+
 void Job::loadBrains(const QString & brainJson)
 {
     brains.clear();
@@ -85,7 +85,11 @@ void Job::loadBrains(const QString & brainJson)
         brains.push_back(new Brain(this, i+1, json.object()));
     }
     copyToBestBrain(brains[0]);
+    mutexBestBrain.lock();
+    bestBrain.json = brains[0]->json;
+    mutexBestBrain.unlock();
 }
+
 
 void Job::evaluate(Brain * brain)
 {
@@ -105,7 +109,30 @@ void Job::evaluate(Brain * brain)
     copyFromBestBrain(brain);
     brain->mutate(mutationFrequency,mutationIntensity);
 }
-/******************************************************************************/
+
+
+void Job::saveBestBrain(const QString & fileName)
+{
+    //
+    bool ok = true;
+    QFile file(fileName);
+    //
+    if(ok && !file.open(QFile::WriteOnly))
+    {
+        ok = false;
+        qDebug() << ("Error : can't open file "
+                     + QFileInfo(file).absoluteFilePath());
+    }
+    //
+    if(ok)
+    {
+        mutexBestBrain.lock();
+        file.write(bestBrain.getJson().toUtf8());
+        mutexBestBrain.unlock();
+    }
+}
+
+
 void Job::setMutationFrequency(float v)
 {
     mutationFrequency = v;
@@ -136,7 +163,8 @@ void Job::setMutationFrequencyMax(float v)
         mutationFrequencyMax = mutationFrequencyMin;
     }
 }
-/******************************************************************************/
+
+
 void Job::setMutationIntensity(float v)
 {
     mutationIntensity = v;

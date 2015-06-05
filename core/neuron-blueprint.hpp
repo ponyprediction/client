@@ -7,20 +7,20 @@
 
 class NeuronBlueprint
 {
-  public:
+public:
     NeuronBlueprint();
     NeuronBlueprint(const QJsonObject & json);
     ~NeuronBlueprint();
 
     void addExternalInputId(const int & inputId){
-      externalInputIds.push_back(inputId);}
+        externalInputIds.push_back(inputId);}
     void addNeuronalInputId(const int &  inputId){
-      neuronalInputIds.push_back(inputId);}
+        neuronalInputIds.push_back(inputId);}
     void addBrainalInputId(const int &  inputId){
-      brainalInputIds.push_back(inputId);}
+        brainalInputIds.push_back(inputId);}
     void addWeightId(const int &  weightId){
-      weightIds.push_back(weightId);}
-  //private:
+        weightIds.push_back(weightId);}
+    //private:
     QVector<int> externalInputIds;
     QVector<int> neuronalInputIds;
     QVector<int> brainalInputIds;

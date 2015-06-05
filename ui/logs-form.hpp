@@ -4,17 +4,17 @@
 #include <QWidget>
 
 namespace Ui {
-  class LogsForm;
+class LogsForm;
 }
 
 class LogsForm : public QWidget
 {
     friend class MainWindow;
     Q_OBJECT
-  public:
+public:
     explicit LogsForm(QWidget *parent = 0);
     ~LogsForm();
-  private:
+private:
     Ui::LogsForm * ui;
 };
 

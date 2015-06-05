@@ -8,37 +8,37 @@
 
 class Client : public QObject
 {
-        Q_OBJECT
-    public:
-        Client(QString ip, int port);
-        ~Client();
-        void connect();
-        void disconnect();
-        void log(QString username, QString password);
+    Q_OBJECT
+public:
+    Client(QString ip, int port);
+    ~Client();
+    void connect();
+    void disconnect();
+    void log(QString username, QString password);
 
-        void askJob();
-        void askBrain();
-        void sendBrain(QString brain);
+    void askJob();
+    void askBrain();
+    void sendBrain(QString brain);
 
 
-    signals:
-        void connectionEstablished();
-        void loginRefused();
-        void logged();
-        void disconnected();
-        void jobReceived(int id,
-                         QString problems,
-                         QString bestBrain);
-    private slots:
-        void read();
-        void onDisconnected();
-    private:
-        void handleAnswer(QString answer);
-        void handleRequest(QString request);
-        void write(QString message);
-        QString ip;
-        int port;
-        QTcpSocket tcpSocket;
+signals:
+    void connectionEstablished();
+    void loginRefused();
+    void logged();
+    void disconnected();
+    void jobReceived(int id,
+                     QString problems,
+                     QString bestBrain);
+private slots:
+    void read();
+    void onDisconnected();
+private:
+    void handleAnswer(QString answer);
+    void handleRequest(QString request);
+    void write(QString message);
+    QString ip;
+    int port;
+    QTcpSocket tcpSocket;
 };
 
 #endif // CLIENT_HPP

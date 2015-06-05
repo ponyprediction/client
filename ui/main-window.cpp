@@ -3,8 +3,10 @@
 #include "ui_connection-form.h"
 #include "ui_logs-form.h"
 #include "ui_control-form.h"
+#include "ui_local-form.h"
 #include "core/util.hpp"
 #include <QFile>
+#include <QFileDialog>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -15,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     client(Util::getLineFromConf("ip"), Util::getLineFromConf("port").toInt()),
     isWorking(false),
     controlForm(this),
+    localForm(this),
     timerRefresh(this)
 {
     // UI
@@ -24,9 +27,11 @@ MainWindow::MainWindow(QWidget *parent) :
                      logsForm.ui->plainTextEditLogs,
                      SLOT(appendPlainText(QString)));
     addLog("Starting up UI...");
-    ui->mainWidget->layout()->addWidget(&connectionForm);
-    ui->mainWidget->layout()->addWidget(&controlForm);
+    connectionForm.setVisible(false);
+    controlForm.setVisible(false);
+    ui->mainWidget->layout()->addWidget(&localForm);
     ui->logsWidget->layout()->addWidget(&logsForm);
+    //
     QObject::connect(connectionForm.ui->buttonConnect, SIGNAL(clicked()),
                      this, SLOT(onConnect()));
     QObject::connect(connectionForm.ui->buttonDisconnect, SIGNAL(clicked()),
@@ -44,8 +49,17 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(jobReceived(int,QString,QString)),
                      this,
                      SLOT(onJobReceived(int,QString,QString)));
-    // Job
-    // Frequency
+    // Local
+    QObject::connect(localForm.ui->buttonLocalTraining,
+                     SIGNAL(clicked()),
+                     this,
+                     SLOT(trainLocally()));
+    // Training
+    QObject::connect(controlForm.ui->buttonSave,
+                     SIGNAL(clicked()),
+                     this,
+                     SLOT(saveBrain()));
+    // Training - Frequency
     QObject::connect(controlForm.ui->radioButtonMutationFrequencyAuto,
                      SIGNAL(clicked(bool)),
                      this,
@@ -70,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(valueChanged(double)),
                      this,
                      SLOT(setMutationFrequencyMax(double)));
-    // Intensity
+    // Training - Intensity
     QObject::connect(controlForm.ui->radioButtonMutationIntensityAuto,
                      SIGNAL(clicked(bool)),
                      this,
@@ -95,23 +109,9 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(valueChanged(double)),
                      this,
                      SLOT(setMutationIntensityMax(double)));
-    addLog("UI ready");
-    // Other
-    QObject::connect(&timerRefresh, SIGNAL(timeout()), this, SLOT(onRefresh()));
-    timerRefresh.start(30);
     //
-    QString problems;
-    QFile file(Util::getLineFromConf("problemsFilename"));
-    file.open(QFile::ReadOnly);
-    problems = file.readAll();
-    file.close();
-    QString bestBrain;
-    file.setFileName(Util::getLineFromConf("brainFilename"));
-    file.open(QFile::ReadOnly);
-    bestBrain = file.readAll();
-    file.close();
-
-    onJobReceived(42, problems, bestBrain);
+    QObject::connect(&timerRefresh, SIGNAL(timeout()), this, SLOT(onRefresh()));
+    addLog("UI ready");
 }
 
 
@@ -154,6 +154,7 @@ void MainWindow::addLog(const QString & message)
 }
 
 
+
 void MainWindow::onConnect()
 {
     client.connect();
@@ -190,25 +191,30 @@ void MainWindow::onLogged()
 }
 
 
-void MainWindow::onJobReceived(int id,
+void MainWindow::startTraining(int id,
                                QString problemsJson,
                                QString bestBrainJson)
 {
+    localForm.setVisible(false);
+    ui->mainWidget->layout()->removeWidget(&localForm);
+    controlForm.setVisible(true);
+    ui->mainWidget->layout()->addWidget(&controlForm);
     int brainCount = Util::getLineFromConf("brainCount").toInt();
-    int interval = 10;
-    job = new Job(id, problemsJson, bestBrainJson, brainCount, interval);
+    job = new Job(id, problemsJson, bestBrainJson, brainCount);
     job->start();
+    timerRefresh.start(30);
 }
 
 
 void MainWindow::setMutationFrequencyAuto(bool value)
 {
     job->setMutationFrequencyAuto(value);
-    //controlForm.ui->widgetMutationFrequency->setEnabled(value);
     controlForm.ui->doubleSpinBoxMutationFrequency->setEnabled(!value);
     if(!value)
+    {
         controlForm.ui->doubleSpinBoxMutationFrequency->setValue(
                     job->getMutationFrequency());
+    }
 }
 void MainWindow::setMutationFrequency(double value)
 {
@@ -235,11 +241,12 @@ void MainWindow::setMutationFrequencyMin(double value)
 void MainWindow::setMutationIntensityAuto(bool value)
 {
     job->setMutationIntensityAuto(value);
-    //controlForm.ui->widgetMutationIntensity->setEnabled(value);
     controlForm.ui->doubleSpinBoxMutationIntensity->setEnabled(!value);
     if(!value)
+    {
         controlForm.ui->doubleSpinBoxMutationIntensity->setValue(
                     job->getMutationIntensity());
+    }
 }
 void MainWindow::setMutationIntensity(double value)
 {
@@ -260,6 +267,32 @@ void MainWindow::setMutationIntensityMax(double value)
 void MainWindow::setMutationIntensityMin(double value)
 {
     job->setMutationIntensityMin(value);
+}
+
+
+void MainWindow::trainLocally()
+{
+    QString problems;
+    QFile file(Util::getLineFromConf("problemsFilename"));
+    file.open(QFile::ReadOnly);
+    problems = file.readAll();
+    file.close();
+    QString bestBrain;
+    file.setFileName(Util::getLineFromConf("brainFilename"));
+    file.open(QFile::ReadOnly);
+    bestBrain = file.readAll();
+    file.close();
+    startTraining(42, problems, bestBrain);
+}
+
+
+void MainWindow::saveBrain()
+{
+    QString fileName = QFileDialog::getSaveFileName(
+                this,"Save Brain",
+                Util::getLineFromConf("pathToBrains") + "/default.brain",
+                "Brain (*.brain)");
+    job->saveBestBrain(fileName);
 }
 
 

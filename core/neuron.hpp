@@ -4,7 +4,7 @@
 
 class Neuron
 {
-  public:
+public:
     Neuron();
     ~Neuron();
     void addExternalInput(float * input);
@@ -13,7 +13,7 @@ class Neuron
     void compute();
     float getOutput(){return output;}
     float * getOutputAdress(){return &output;}
-  private:
+private:
     QVector<float *> externalInputs;
     QVector<float *> neuronalInputs; // = outputs from neuron
     QVector<float *> brainalInputs; // = outputs from brain

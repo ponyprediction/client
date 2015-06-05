@@ -4,18 +4,18 @@
 #include <QWidget>
 
 namespace Ui {
-  class ConnectionForm;
+class ConnectionForm;
 }
 
 class ConnectionForm : public QWidget
 {
     friend class MainWindow;
     Q_OBJECT
-  public:
+public:
     explicit ConnectionForm(QWidget *parent = 0);
     ~ConnectionForm();
 
-  private:
+private:
     Ui::ConnectionForm *ui;
 };
 

@@ -22,7 +22,8 @@ Brain::Brain() :
     id(-1),
     attempts(0.0f),
     score(0.0f),
-    ratio(0.0f)
+    ratio(0.0f),
+    json()
 {
 
 }
@@ -123,9 +124,37 @@ void Brain::mutate(float mutationFrequency, float mutationIntensity)
     }
 }
 
+
+QString Brain::getJson()
+{
+    // Init
+    QString str;
+    bool ok = true;
+    //
+    if(ok)
+    {
+        for(int i = 0 ; i < weights.size() ; i++)
+        {
+            if(i)
+            {
+                str += ";";
+            }
+            str += QString::number(weights[i], 'f', 6);
+        }
+        json["weights"] = str;
+        QJsonDocument document;
+        document.setObject(json);
+        str = document.toJson();
+    }
+    //
+    return str;
+}
+
+
 void Brain::load(const QJsonObject & json)
 {
-    //qDebug() << json;
+    //
+    this->json = json;
     // neuronCount
     neuronCount = json["neuronCount"].toInt();
     neuronBlueprints.clear();
@@ -199,22 +228,3 @@ void Brain::initNeurons()
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
