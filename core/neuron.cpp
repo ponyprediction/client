@@ -1,6 +1,6 @@
 #include "neuron.hpp"
 #include <QDebug>
-
+#include <math.h>
 Neuron::Neuron()
 {
 
