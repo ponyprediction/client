@@ -22,16 +22,28 @@ bool Util::isOverwriting = false;
 
 void Util::init(MainWindow * mainWindow)
 {
+    bool ok = true;
     Util::mainWindow = mainWindow;
+    // check folders
+    QStringList paths;
+    paths << Util::getLineFromConf("pathToBrains");
+    paths << Util::getLineFromConf("pathToTrainingSets");
+    paths << Util::getLineFromConf("pathToProblems");
+    foreach(QString path, paths)
+    {
+        QDir dir(path);
+        if (!dir.exists()) {
+            ok = dir.mkpath(".");
+        }
+        if(!ok)
+        {
+            ok = false;
+            Util::writeError("cannot create " + path);
+            break;
+        }
+    }
 }
 
-/*void Util::addLog(const QString & message)
-{
-    if(mainWindow)
-    {
-        emit mainWindow->newLog(message);
-    }
-}*/
 
 QString Util::getLineFromConf(const QString &id)
 {

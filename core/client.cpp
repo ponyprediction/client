@@ -119,7 +119,7 @@ void Client::handleAnswer(QString answer)
     }
     else if(answer.startsWith("trainingset"))
     {
-        trainingSetJson = answer.remove(0,4);
+        trainingSetJson = answer.remove(0,12);
         trainingSetIsSet = true;
     }
     else if(answer.startsWith("brain"))

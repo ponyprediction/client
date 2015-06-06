@@ -319,17 +319,35 @@ void MainWindow::setMutationIntensityMin(double value)
 
 void MainWindow::trainLocally()
 {
+    bool ok = true;
     QString trainingSet;
-    QFile file(Util::getLineFromConf("problemsFilename"));
-    file.open(QFile::ReadOnly);
-    trainingSet = file.readAll();
-    file.close();
+    QFile file(Util::getLineFromConf("trainingSetFilename"));
     QString bestBrain;
-    file.setFileName(Util::getLineFromConf("brainFilename"));
-    file.open(QFile::ReadOnly);
-    bestBrain = file.readAll();
-    file.close();
-    startTraining(42, trainingSet, bestBrain);
+    //
+    if(ok && !file.open(QFile::ReadOnly))
+    {
+        ok = false;
+        Util::writeError("can't open training set : "
+                         + QFileInfo(file).absoluteFilePath());
+    }
+    if(ok)
+    {
+        trainingSet = file.readAll();
+        file.close();
+        file.setFileName(Util::getLineFromConf("brainFilename"));
+    }
+    if(ok && !file.open(QFile::ReadOnly))
+    {
+        ok = false;
+        Util::writeError("can't open brain : "
+                         + QFileInfo(file).absoluteFilePath());
+    }
+    if(ok)
+    {
+        bestBrain = file.readAll();
+        file.close();
+        startTraining(42, trainingSet, bestBrain);
+    }
 }
 
 
@@ -363,8 +381,9 @@ void MainWindow::onJobReceived(int id,
                                QString problemsJson,
                                QString bestBrainJson)
 {
+    qDebug() << bestBrainJson;
     startTraining(id, problemsJson, bestBrainJson);
-    timerSendBrain.start(Util::getLineFromConf("intervalSendBrain").toInt());
+    //timerSendBrain.start(Util::getLineFromConf("intervalSendBrain").toInt());
 }
 
 void MainWindow::sendBrain()
