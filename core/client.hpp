@@ -40,10 +40,10 @@ private:
     int port;
     QTcpSocket tcpSocket;
 
-    QString jobJson;
+    QString trainingSetJson;
     QString brainJson;
 
-    bool jobIsSet;
+    bool trainingSetIsSet;
     bool brainIsSet;
 
     QString currentAnswer;

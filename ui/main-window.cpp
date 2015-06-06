@@ -180,7 +180,7 @@ void MainWindow::onConnected()
 
 void MainWindow::onLoginRefused()
 {
-    Util::addLog("The server refused the connection. "
+    Util::writeError("The server refused the connection. "
                  "Bad username / Bad password / Unconfirmed account");
     connectionForm.ui->lineEditUsername->setEnabled(true);
     connectionForm.ui->lineEditPassword->setEnabled(true);
@@ -221,7 +221,7 @@ void MainWindow::startTraining(int id,
 
 void MainWindow::solve(QString problemsJson, QString brainJson)
 {
-    Util::addLog(Job::getPrediction(problemsJson, brainJson));
+    Util::write(Job::getPrediction(problemsJson, brainJson));
 }
 
 

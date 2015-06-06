@@ -8,9 +8,9 @@ Client::Client(QString ip, int port) :
     ip(ip),
     port(port),
     tcpSocket(),
-    jobJson(),
+    trainingSetJson(),
     brainJson(),
-    jobIsSet(false),
+    trainingSetIsSet(false),
     brainIsSet(false),
     currentAnswer("")
 {
@@ -23,7 +23,6 @@ Client::Client(QString ip, int port) :
 
 Client::~Client()
 {
-
 }
 
 
@@ -87,37 +86,30 @@ void Client::handleAnswer(QString answer)
     }
     else if(answer == "wtf")
     {
-        Util::addLog("Server doesn't seem to understand the request");
-    }
-    else if(answer == "unicorn")
-    {
-        emit loginRefused();
-    }
-    else if(answer.startsWith("job"))
-    {
-        jobJson = answer.remove(0,4);
-        jobIsSet = true;
-        if(brainIsSet && jobIsSet)
-        {
-            emit jobReceived(0, brainJson,jobJson);
-            brainIsSet = false;
-            jobIsSet = false;
-        }
+        Util::writeError("The server doesn't seem to understand the request");
     }
     else if(answer == "bye")
     {
         tcpSocket.disconnectFromHost();
         emit disconnected();
     }
+    else if(answer == "unicorn")
+    {
+        emit loginRefused();
+    }
+    else if(answer.startsWith("trainingset"))
+    {
+        trainingSetJson = answer.remove(0,4);
+        trainingSetIsSet = true;
+    }
     else if(answer.startsWith("brain"))
     {
         brainJson = answer.remove(0,6);
         brainIsSet = true;
-        if(brainIsSet && jobIsSet)
+        if(brainIsSet && trainingSetIsSet)
         {
-            emit jobReceived(0,jobJson,brainJson);
+            emit jobReceived(0, trainingSetJson, brainJson);
             brainIsSet = false;
-            jobIsSet = false;
         }
     }
     else if(answer == "brainreceived")

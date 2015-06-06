@@ -3,22 +3,35 @@
 #include <QFile>
 #include <QDir>
 #include <QXmlStreamReader>
+#include <iostream>
+
 
 MainWindow * Util::mainWindow = nullptr;
 QString Util::configFileName = "./client.conf";
+
+bool Util::writeEnabled = true;
+bool Util::overwriteEnabled = true;
+bool Util::successEnabled = true;
+bool Util::successOverwriteEnabled = true;
+bool Util::warningsEnabled = true;
+bool Util::warningOverwriteEnabled = true;
+bool Util::errorEnabled = true;
+bool Util::errorOverwriteEnabled = true;
+bool Util::isOverwriting = false;
+
 
 void Util::init(MainWindow * mainWindow)
 {
     Util::mainWindow = mainWindow;
 }
 
-void Util::addLog(const QString & message)
+/*void Util::addLog(const QString & message)
 {
     if(mainWindow)
     {
         emit mainWindow->newLog(message);
     }
-}
+}*/
 
 QString Util::getLineFromConf(const QString &id)
 {
@@ -44,8 +57,7 @@ QString Util::getLineFromConf(const QString &id)
     }
     if(!output.size())
     {
-        Util::addLog("Can not find '" + id + "' in conf file.");
-        qDebug() << "Can not find '" + id + "' in conf file.";
+        Util::writeError("Can not find '" + id + "' in conf file.");
     }
     return output;
 }
@@ -62,4 +74,86 @@ int Util::getRandomInt(const int &min, const int &max)
     if(r < min || r > max)
         r = getRandomInt(min, max);
     return r;
+}
+
+
+void Util::write(const QString & message)
+{
+    if(isOverwriting)
+    {
+        overwrite("");
+        isOverwriting = false;
+    }
+    std::cout << message.toStdString() << std::endl;
+    if(mainWindow)
+    {
+        emit mainWindow->newLog(message);
+    }
+}
+
+
+void Util::writeSuccess(const QString &message)
+{
+    if(successEnabled)
+        write(VERT + message + RESET);
+}
+
+
+void Util::writeWarning(const QString &message)
+{
+    if(warningsEnabled)
+        write(QString(JAUNE) + "Warning : " + message + RESET);
+}
+
+
+void Util::writeError(const QString & message)
+{
+    if(errorEnabled)
+        write(QString(ROUGE) + "Error : " + message + RESET);
+}
+
+
+void Util::overwrite(const QString &message)
+{
+    if(overwriteEnabled)
+    {
+        isOverwriting = true;
+        std::cout << '\r';
+        for(int i = 0 ; i < 80 ; i++)
+        {
+            std::cout << ' ';
+        }
+        std::cout << '\r' << message.toStdString() << std::flush;
+    }
+    else
+    {
+        write(message);
+    }
+}
+
+
+void Util::overwriteSuccess(const QString &message)
+{
+    if(successEnabled && successOverwriteEnabled)
+        overwrite(QString(VERT) + message + QString(RESET));
+    else
+        writeSuccess(message);
+}
+
+
+void Util::overwriteWarning(const QString &message)
+{
+    if(warningsEnabled && warningOverwriteEnabled)
+        overwrite(QString(JAUNE)  +  "Warning : " + message + QString(RESET));
+    else
+        writeWarning(message);
+}
+
+
+void Util::overwriteError(const QString &message)
+{
+    if(warningsEnabled && warningOverwriteEnabled)
+        overwrite(QString(JAUNE)  +  "Error : " + message + QString(RESET));
+    else
+        writeWarning(message);
 }

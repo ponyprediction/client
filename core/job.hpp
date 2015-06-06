@@ -55,8 +55,8 @@ public:
 
 private:
 
-    void loadProblems(const QString & trainingSetJson);
-    void loadBrains(const QString & brainJson);
+    void loadProblems(const QString & trainingSetJson, bool & ok);
+    void loadBrains(const QString & brainJson, bool & ok);
     void addRatio(const float & ratio);
     void updateAverageRatio();
     void copyToBestBrain(Brain * brain);
@@ -95,5 +95,7 @@ private:
     float mutationIntensityDown;
     float mutationIntensityMax;
     float mutationIntensityMin;
+
+    bool ok;
 
 };
