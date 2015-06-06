@@ -34,7 +34,8 @@ Client::~Client()
 
 void Client::connect()
 {
-    timerConnect.start(1000);
+    timerConnect.start(Util::getLineFromConf(
+                           "intervalTimeoutConnection").toInt());
     tcpSocket.connectToHost(ip, port);
 }
 
@@ -50,7 +51,6 @@ void Client::onTimeoutConnect()
 void Client::disconnect()
 {
     handleRequest("exit");
-    tcpSocket.disconnectFromHost();
 }
 
 
@@ -114,6 +114,7 @@ void Client::handleAnswer(QString answer)
     else if(answer == "unicorn")
     {
         emit loginRefused();
+        disconnect();
     }
     else if(answer.startsWith("trainingset"))
     {
