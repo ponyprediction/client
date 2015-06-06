@@ -381,7 +381,6 @@ void MainWindow::onJobReceived(int id,
                                QString problemsJson,
                                QString bestBrainJson)
 {
-    qDebug() << bestBrainJson;
     startTraining(id, problemsJson, bestBrainJson);
     //timerSendBrain.start(Util::getLineFromConf("intervalSendBrain").toInt());
 }

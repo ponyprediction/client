@@ -51,8 +51,8 @@ QString Util::getLineFromConf(const QString &id)
     QFile file(configFileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        qDebug() << "Can not find the conf file at : "
-                    + QFileInfo(file).absoluteFilePath();
+        Util::writeError("Can not find the conf file at : "
+                         + QFileInfo(file).absoluteFilePath());
         return QString();
     }
     QXmlStreamReader xml(&file);

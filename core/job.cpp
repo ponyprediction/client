@@ -103,13 +103,24 @@ void Job::loadProblems(const QString & trainingSetJson, bool & ok)
 
 void Job::loadBrains(const QString & brainJson, bool & ok)
 {
+    QJsonDocument jsonDoc;
+    // Check Json validity
+    if(ok)
+    {
+        jsonDoc = QJsonDocument::fromJson(brainJson.toUtf8());
+        if(jsonDoc.isEmpty())
+        {
+            ok = false;
+            Util::writeError("the Json for the brain is unvalid");
+        }
+    }
+    // Add brains
     if(ok)
     {
         brains.clear();
-        QJsonDocument json = QJsonDocument::fromJson(brainJson.toUtf8());
         for(int i = 0 ; i < brainCount ; i++)
         {
-            brains.push_back(new Brain(this, i+1, json.object()));
+            brains.push_back(new Brain(this, i+1, jsonDoc.object()));
         }
         copyToBestBrain(brains[0]);
         mutexBestBrain.lock();
@@ -148,8 +159,8 @@ void Job::saveBestBrain(const QString & fileName)
     if(ok && !file.open(QFile::WriteOnly))
     {
         ok = false;
-        qDebug() << ("Error : can't open file "
-                     + QFileInfo(file).absoluteFilePath());
+        Util::writeError("Error : can't open file "
+                         + QFileInfo(file).absoluteFilePath());
     }
     //
     if(ok)

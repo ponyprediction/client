@@ -13,7 +13,6 @@ NeuronBlueprint::NeuronBlueprint(const QJsonObject & json)
     brainalInputIds.clear();
     weightIds.clear();
     // externalInputIds
-    //qDebug() << json;
     {
         QString str = json["externalInputIds"].toString();
         if(str.size())

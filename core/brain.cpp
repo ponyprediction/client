@@ -95,7 +95,6 @@ void Brain::prepareResult()
             result = i-1;
         }
     }
-    //result -= 1; // result € [1 - 20]
 }
 
 void Brain::learn(const int & wantedResult)
@@ -170,43 +169,63 @@ QString Brain::getPrediction(const QVector<float> & inputs)
 
 void Brain::load(const QJsonObject & json)
 {
-    //
+    bool ok = true;
     this->json = json;
+    QString weightsStr;
+    QStringList weightsStrList;
     // neuronCount
-    neuronCount = json["neuronCount"].toInt();
-    neuronBlueprints.clear();
-    neurons = QVector<Neuron>(neuronCount, Neuron());
+    if(ok)
+    {
+        neuronCount = json["neuronCount"].toInt();
+        neuronBlueprints.clear();
+        neurons = QVector<Neuron>(neuronCount, Neuron());
+    }
     // inputCount
-    inputCount = json["inputCount"].toInt();
-    inputs = QVector<float>(inputCount, 0.0f);
+    if(ok)
+    {
+        inputCount = json["inputCount"].toInt();
+        inputs = QVector<float>(inputCount, 0.0f);
+    }
     // weightCount
-    weightCount = json["weightCount"].toInt();
-    weights = QVector<float>(weightCount, 0.0f);
+    if(ok)
+    {
+        weightCount = json["weightCount"].toInt();
+        weights = QVector<float>(weightCount, 0.0f);
+
+        weightsStr = json["weights"].toString();
+        weightsStrList = weightsStr.split(';');
+        if(weightsStrList.size() != weightCount)
+        {
+            ok = false;
+            Util::writeError("problem loading weights, the count ain't right : "
+                             + QString::number(weightsStrList.size())
+                             + " vs " + QString::number(weightCount));
+        }
+    }
     // weights
-    QString weightsStr = json["weights"].toString();
-    QStringList weightsStrList = weightsStr.split(';');
-    if(weightsStrList.size() == weightCount)
+    if(ok)
     {
         weights = QVector<float>(weightCount, 0.0f);
         for(int i = 0 ; i < weightCount ; i++)
         {
             weights[i] = weightsStrList[i].toFloat();
         }
-    }
-    else
-    {
-        qDebug() << "Problem loading weights : "
-                    "the count ain't right";
-        qDebug() << weightsStrList.size() << weightCount;
+
     }
     // outputCount
-    outputCount = json["outputCount"].toInt();
-    outputs = QVector<float>(outputCount, 0.0f);
-    // neurons
-    QJsonArray neurarr = json["neurons"].toArray();
-    for(int i = 0 ; i < neurarr.size() ; i++)
+    if(ok)
     {
-        neuronBlueprints.push_back(NeuronBlueprint(neurarr[i].toObject()));
+        outputCount = json["outputCount"].toInt();
+        outputs = QVector<float>(outputCount, 0.0f);
+    }
+    // neurons
+    if(ok)
+    {
+        QJsonArray neurarr = json["neurons"].toArray();
+        for(int i = 0 ; i < neurarr.size() ; i++)
+        {
+            neuronBlueprints.push_back(NeuronBlueprint(neurarr[i].toObject()));
+        }
     }
 }
 
