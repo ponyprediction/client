@@ -157,6 +157,11 @@ void MainWindow::onRefresh()
                 job->getMutationIntensityMin());
     controlForm.ui->doubleSpinBoxMutationIntensityMax->setValue(
                 job->getMutationIntensityMax());
+    // Ratios
+    controlForm.ui->labelRatio->setText(
+                QString::number(job->getBestRatio(), 'f', 6));
+    controlForm.ui->labelAverageRatio->setText(
+                QString::number(job->getAverageRatio(), 'f', 6));
 }
 
 
@@ -197,7 +202,6 @@ void MainWindow::onLoginRefused()
     connectionForm.ui->lineEditUsername->setEnabled(true);
     connectionForm.ui->lineEditPassword->setEnabled(true);
     connectionForm.ui->buttonConnect->setEnabled(true);
-    client.disconnect();
 }
 
 

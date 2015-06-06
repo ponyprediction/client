@@ -130,11 +130,11 @@ void Job::evaluate(Brain * brain)
     mutexAverageRatio.lock();
     float averagetmp = averageRatio;
     mutexAverageRatio.unlock();
-    Util::write("Brain #" + QString::number(brain->getId())
+    /*Util::write("Brain #" + QString::number(brain->getId())
                 + " : " + QString::number(brain->getRatio(), 'f', 6)
                 + " : " + QString::number(averagetmp, 'f', 6)
                 + " : " + QString::number(mutationFrequency, 'f', 6)
-                + " : " + QString::number(mutationIntensity, 'f', 6));
+                + " : " + QString::number(mutationIntensity, 'f', 6));*/
     if(brain->getRatio() > averagetmp)
     {
         copyToBestBrain(brain);
@@ -278,6 +278,24 @@ void Job::setMutationIntensityMax(float v)
         mutationIntensityMax = mutationIntensityMin;
     }
 }
+
+float Job::getBestRatio()
+{
+    mutexBestBrain.lock();
+    float ratio = bestBrain.getRatio();
+    mutexBestBrain.unlock();
+    return ratio;
+}
+
+
+float Job::getAverageRatio()
+{
+    mutexAverageRatio.lock();
+    float ratio = averageRatio;
+    mutexAverageRatio.unlock();
+    return ratio;
+}
+
 
 QString Job::getBestBrain()
 {

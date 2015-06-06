@@ -54,6 +54,9 @@ public:
     float getMutationIntensityMin(){return mutationIntensityMin;}
     float getMutationIntensityMax(){return mutationIntensityMax;}
 
+    float getBestRatio();
+    float getAverageRatio();
+
     QString getBestBrain();
 
 private:
