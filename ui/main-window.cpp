@@ -146,6 +146,10 @@ void MainWindow::onRefresh()
                 job->getMutationFrequencyMin());
     controlForm.ui->doubleSpinBoxMutationFrequencyMax->setValue(
                 job->getMutationFrequencyMax());
+    controlForm.ui->doubleSpinBoxMutationFrequency->setEnabled(
+                !job->getMutationFrequencyAuto());
+    controlForm.ui->radioButtonMutationFrequencyAuto->setChecked(
+                job->getMutationFrequencyAuto());
     // Intensity
     controlForm.ui->doubleSpinBoxMutationIntensity->setValue(
                 job->getMutationIntensity());
@@ -157,6 +161,10 @@ void MainWindow::onRefresh()
                 job->getMutationIntensityMin());
     controlForm.ui->doubleSpinBoxMutationIntensityMax->setValue(
                 job->getMutationIntensityMax());
+    controlForm.ui->doubleSpinBoxMutationIntensity->setEnabled(
+                !job->getMutationIntensityAuto());
+    controlForm.ui->radioButtonMutationIntensityAuto->setChecked(
+                job->getMutationIntensityAuto());
     // Ratios
     controlForm.ui->labelRatio->setText(
                 QString::number(job->getBestRatio(), 'f', 6));
@@ -260,12 +268,6 @@ void MainWindow::solve(QString problemsJson, QString brainJson)
 void MainWindow::setMutationFrequencyAuto(bool value)
 {
     job->setMutationFrequencyAuto(value);
-    controlForm.ui->doubleSpinBoxMutationFrequency->setEnabled(!value);
-    if(!value)
-    {
-        controlForm.ui->doubleSpinBoxMutationFrequency->setValue(
-                    job->getMutationFrequency());
-    }
 }
 void MainWindow::setMutationFrequency(double value)
 {
@@ -292,12 +294,6 @@ void MainWindow::setMutationFrequencyMin(double value)
 void MainWindow::setMutationIntensityAuto(bool value)
 {
     job->setMutationIntensityAuto(value);
-    controlForm.ui->doubleSpinBoxMutationIntensity->setEnabled(!value);
-    if(!value)
-    {
-        controlForm.ui->doubleSpinBoxMutationIntensity->setValue(
-                    job->getMutationIntensity());
-    }
 }
 void MainWindow::setMutationIntensity(double value)
 {

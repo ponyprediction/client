@@ -36,6 +36,7 @@ public:
     void setMutationFrequencyUp(float v){mutationFrequencyUp = v;}
     void setMutationFrequencyMin(float v);
     void setMutationFrequencyMax(float v);
+    bool getMutationFrequencyAuto(){return mutationFrequencyAuto;}
     float getMutationFrequency(){return mutationFrequency;}
     float getMutationFrequencyDown(){return mutationFrequencyDown;}
     float getMutationFrequencyUp(){return mutationFrequencyUp;}
@@ -48,6 +49,7 @@ public:
     void setMutationIntensityUp(float v){mutationIntensityUp = v;}
     void setMutationIntensityMin(float v);
     void setMutationIntensityMax(float v);
+    bool getMutationIntensityAuto(){return mutationIntensityAuto;}
     float getMutationIntensity(){return mutationIntensity;}
     float getMutationIntensityDown(){return mutationIntensityDown;}
     float getMutationIntensityUp(){return mutationIntensityUp;}

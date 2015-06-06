@@ -53,11 +53,6 @@ Job::Job(const int & id,
     {
         loadBrains(brainJson, ok);
     }
-    if(ok)
-    {
-        setMutationFrequency(mutationFrequency);
-        setMutationIntensity(mutationIntensity);
-    }
 }
 
 Job::~Job()
