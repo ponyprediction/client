@@ -32,6 +32,7 @@ private slots:
     void onRefresh();
     void onConnect();
     void onConnected();
+    void onTimeoutConnect();
     void onDisconnect();
     void onDisconnected();
     void onLoginRefused();

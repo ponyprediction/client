@@ -12,12 +12,18 @@ Client::Client(QString ip, int port) :
     brainJson(),
     trainingSetIsSet(false),
     brainIsSet(false),
-    currentAnswer("")
+    currentAnswer(""),
+    timerConnect(this)
 {
+    //
+    timerConnect.setSingleShot(true);
+    //
     QObject::connect(&tcpSocket, SIGNAL(readyRead()),
                      this, SLOT(read()));
     QObject::connect(&tcpSocket, SIGNAL(disconnected()),
                      this, SLOT(onDisconnected()));
+    QObject::connect(&timerConnect, SIGNAL(timeout()),
+                     this, SLOT(onTimeoutConnect()));
 }
 
 
@@ -28,13 +34,23 @@ Client::~Client()
 
 void Client::connect()
 {
+    timerConnect.start(1000);
     tcpSocket.connectToHost(ip, port);
+}
+
+
+void Client::onTimeoutConnect()
+{
+    Util::writeWarning("can't connect to server");
+    tcpSocket.disconnectFromHost();
+    emit timeoutConnect();
 }
 
 
 void Client::disconnect()
 {
     handleRequest("exit");
+    tcpSocket.disconnectFromHost();
 }
 
 
@@ -72,6 +88,8 @@ void Client::onDisconnected()
 {
     emit disconnected();
 }
+
+
 
 
 void Client::handleAnswer(QString answer)

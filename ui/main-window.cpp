@@ -50,6 +50,11 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(jobReceived(int,QString,QString)),
                      this,
                      SLOT(onJobReceived(int,QString,QString)));
+
+    QObject::connect(&client,
+                     SIGNAL(timeoutConnect()),
+                     this,
+                     SLOT(onTimeoutConnect()));
     // Local
     QObject::connect(localForm.ui->buttonLocalTraining,
                      SIGNAL(clicked()),
@@ -175,6 +180,13 @@ void MainWindow::onConnected()
 {
     client.log(connectionForm.ui->lineEditUsername->text(),
                connectionForm.ui->lineEditPassword->text());
+}
+
+void MainWindow::onTimeoutConnect()
+{
+    connectionForm.ui->lineEditUsername->setEnabled(true);
+    connectionForm.ui->lineEditPassword->setEnabled(true);
+    connectionForm.ui->buttonConnect->setEnabled(true);
 }
 
 
@@ -369,8 +381,6 @@ void MainWindow::onDisconnect()
 
 void MainWindow::onDisconnected()
 {
-    connectionForm.ui->buttonConnect->setVisible(true);
-    connectionForm.ui->buttonDisconnect->setVisible(false);
     connectionForm.ui->lineEditUsername->setEnabled(true);
     connectionForm.ui->lineEditPassword->setEnabled(true);
     connectionForm.ui->buttonConnect->setEnabled(true);
