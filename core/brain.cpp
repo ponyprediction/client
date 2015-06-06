@@ -128,11 +128,12 @@ void Brain::mutate(float mutationFrequency, float mutationIntensity)
 QString Brain::getJson()
 {
     // Init
-    QString str;
+    QString jsonStr = "";
     bool ok = true;
-    //
+    // Weights
     if(ok)
     {
+        QString str = "";
         for(int i = 0 ; i < weights.size() ; i++)
         {
             if(i)
@@ -142,12 +143,21 @@ QString Brain::getJson()
             str += QString::number(weights[i], 'f', 6);
         }
         json["weights"] = str;
-        QJsonDocument document;
-        document.setObject(json);
-        str = document.toJson();
+    }
+    // Ratio
+    if(ok)
+    {
+        json["ratio"] = QString::number(ratio, 'f', 6);
     }
     //
-    return str;
+    if(ok)
+    {
+        QJsonDocument document;
+        document.setObject(json);
+        jsonStr = document.toJson();
+    }
+    //
+    return jsonStr;
 }
 
 QString Brain::getPrediction(const QVector<float> & inputs)
