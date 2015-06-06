@@ -17,7 +17,8 @@ Job::Job() : QObject()
 Job::Job(const int & id,
          const QString & trainingSetJson,
          const QString & brainJson,
-         const int & brainCount) :
+         const int & brainCount,
+         bool & ok) :
     QObject(),
     id(id),
     problems(),
@@ -44,7 +45,6 @@ Job::Job(const int & id,
     mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat()),
     mutationIntensityAuto(Util::getLineFromConf("mutationIntensityAuto").toInt())
 {
-    ok = true;
     if(ok)
     {
         loadProblems(trainingSetJson, ok);
@@ -68,12 +68,9 @@ Job::~Job()
 
 void Job::start()
 {
-    if(ok)
+    for(int i = 0 ; i < brains.size() ; i++)
     {
-        for(int i = 0 ; i < brains.size() ; i++)
-        {
-            brains[i]->start(&problems);
-        }
+        brains[i]->start(&problems);
     }
 }
 
@@ -134,10 +131,10 @@ void Job::evaluate(Brain * brain)
     float averagetmp = averageRatio;
     mutexAverageRatio.unlock();
     Util::write("Brain #" + QString::number(brain->getId())
-                 + " : " + QString::number(brain->getRatio(), 'f', 6)
-                 + " : " + QString::number(averagetmp, 'f', 6)
-                 + " : " + QString::number(mutationFrequency, 'f', 6)
-                 + " : " + QString::number(mutationIntensity, 'f', 6));
+                + " : " + QString::number(brain->getRatio(), 'f', 6)
+                + " : " + QString::number(averagetmp, 'f', 6)
+                + " : " + QString::number(mutationFrequency, 'f', 6)
+                + " : " + QString::number(mutationIntensity, 'f', 6));
     if(brain->getRatio() > averagetmp)
     {
         copyToBestBrain(brain);
@@ -169,12 +166,12 @@ void Job::saveBestBrain(const QString & fileName)
 }
 
 
-QString Job::getPrediction(QString problemsJson, QString brainJson)
+QString Job::getPrediction(QString problemsJson, QString brainJson, bool & ok)
 {
-    bool ok =true;
     QJsonDocument json;
     QJsonArray problemsJsonArray;
     QVector<Problem*> problems;
+    QString prediction;
     // Brain
     Brain brain(nullptr, 0,
                 QJsonDocument::fromJson(brainJson.toUtf8()).object());
@@ -185,7 +182,7 @@ QString Job::getPrediction(QString problemsJson, QString brainJson)
         if(json.isEmpty())
         {
             ok = false;
-            qDebug() << "can't load problems";
+            Util::writeError("can't load problems");
         }
     }
     if(ok)
@@ -202,17 +199,20 @@ QString Job::getPrediction(QString problemsJson, QString brainJson)
         }
     }
     // Compute
-    QString a = "{ ";
-    for(int i = 0 ; i < problems.size() ; i++)
+    if(ok)
     {
-        if(i)
+        prediction = "{ ";
+        for(int i = 0 ; i < problems.size() ; i++)
         {
-            a += " ; ";
+            if(i)
+            {
+                prediction += " ; ";
+            }
+            prediction += (brain.getPrediction(problems[i]->getInputs()));
         }
-        a += (brain.getPrediction(problems[i]->getInputs()));
+        prediction += " }";
     }
-    a += " }";
-    return a;
+    return prediction;
 }
 
 

@@ -18,14 +18,17 @@ public:
     Job(const int & id,
         const QString & trainingSetJson,
         const QString & brainJson,
-        const int & brainCount);
+        const int & brainCount,
+        bool & ok);
     ~Job();
 
     void start();
     void evaluate(Brain * brain);
     void saveBestBrain(const QString & fileName);
 
-    QString static getPrediction(QString problemsJson, QString brainJson);
+    QString static getPrediction(QString problemsJson,
+                                 QString brainJson,
+                                 bool & ok);
 
     void setMutationFrequencyAuto(bool v){mutationFrequencyAuto = v;}
     void setMutationFrequency(float v);
@@ -95,7 +98,5 @@ private:
     float mutationIntensityDown;
     float mutationIntensityMax;
     float mutationIntensityMin;
-
-    bool ok;
 
 };

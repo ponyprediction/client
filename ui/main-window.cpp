@@ -181,7 +181,7 @@ void MainWindow::onConnected()
 void MainWindow::onLoginRefused()
 {
     Util::writeError("The server refused the connection. "
-                 "Bad username / Bad password / Unconfirmed account");
+                     "Bad username / Bad password / Unconfirmed account");
     connectionForm.ui->lineEditUsername->setEnabled(true);
     connectionForm.ui->lineEditPassword->setEnabled(true);
     connectionForm.ui->buttonConnect->setEnabled(true);
@@ -205,23 +205,39 @@ void MainWindow::startTraining(int id,
                                QString trainingSetJson,
                                QString bestBrainJson)
 {
-    connectionForm.setVisible(false);
-    ui->mainWidget->layout()->removeWidget(&connectionForm);
-    localForm.setVisible(false);
-    ui->mainWidget->layout()->removeWidget(&localForm);
-    controlForm.setVisible(true);
-    ui->mainWidget->layout()->addWidget(&controlForm);
-    //
+    bool ok = true;
     int brainCount = Util::getLineFromConf("brainCount").toInt();
-    job = new Job(id, trainingSetJson, bestBrainJson, brainCount);
-    job->start();
-    timerRefresh.start(30);
+    if(ok)
+    {
+        job = new Job(id, trainingSetJson, bestBrainJson, brainCount, ok);
+    }
+    if(ok)
+    {
+        job->start();
+
+        connectionForm.setVisible(false);
+        ui->mainWidget->layout()->removeWidget(&connectionForm);
+        localForm.setVisible(false);
+        ui->mainWidget->layout()->removeWidget(&localForm);
+        controlForm.setVisible(true);
+        ui->mainWidget->layout()->addWidget(&controlForm);
+        timerRefresh.start(30);
+    }
 }
 
 
 void MainWindow::solve(QString problemsJson, QString brainJson)
 {
-    Util::write(Job::getPrediction(problemsJson, brainJson));
+    bool ok = true;
+    QString str;
+    if(ok)
+    {
+        str = Job::getPrediction(problemsJson, brainJson, ok);
+    }
+    if(ok)
+    {
+        Util::write("Prediction : " + str);
+    }
 }
 
 
@@ -341,7 +357,7 @@ void MainWindow::onJobReceived(int id,
 
 void MainWindow::sendBrain()
 {
-   client.sendBrain(job->getBestBrain());
+    client.sendBrain(job->getBestBrain());
 }
 
 
