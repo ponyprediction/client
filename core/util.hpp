@@ -14,5 +14,5 @@ public:
     static int getRandomInt(const int & min, const int & max);
 private:
     static MainWindow * mainWindow;
-    static QString configFilePath;
+    static QString configFileName;
 };

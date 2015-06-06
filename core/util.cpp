@@ -5,7 +5,7 @@
 #include <QXmlStreamReader>
 
 MainWindow * Util::mainWindow = nullptr;
-QString Util::configFilePath = "./conf.xml";
+QString Util::configFileName = "./client.conf";
 
 void Util::init(MainWindow * mainWindow)
 {
@@ -23,7 +23,7 @@ void Util::addLog(const QString & message)
 QString Util::getLineFromConf(const QString &id)
 {
     QString output = "";
-    QFile file(configFilePath);
+    QFile file(configFileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         qDebug() << "Can not find the conf file at : "

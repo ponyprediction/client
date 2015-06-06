@@ -47,4 +47,4 @@ FORMS    += ui/main-window.ui \
     ui/local-form.ui
 
 DISTFILES += \
-    conf.xml
+    client.conf
