@@ -96,6 +96,7 @@ void Client::handleAnswer(QString answer)
 {
     if(answer == "hi")
     {
+        timerConnect.stop();
         emit connectionEstablished();
     }
     else if(answer == "welcome")
