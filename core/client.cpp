@@ -62,7 +62,7 @@ void Client::log(QString username, QString password)
 
 void Client::askProblems()
 {
-    handleRequest("getjob");
+    handleRequest("gettrainingset");
 }
 
 
