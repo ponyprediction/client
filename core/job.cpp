@@ -305,7 +305,10 @@ float Job::getAverageRatio()
 
 QString Job::getBestBrain()
 {
-    return bestBrain.getJson();
+    mutexBestBrain.lock();
+    QString str = bestBrain.getJson();
+    mutexBestBrain.unlock();
+    return str;
 }
 
 

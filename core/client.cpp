@@ -117,12 +117,12 @@ void Client::handleAnswer(QString answer)
         emit loginRefused();
         disconnect();
     }
-    else if(answer.startsWith("trainingset"))
+    else if(answer.startsWith("trainingset "))
     {
         trainingSetJson = answer.remove(0,12);
         trainingSetIsSet = true;
     }
-    else if(answer.startsWith("brain"))
+    else if(answer.startsWith("brain "))
     {
         brainJson = answer.remove(0,6);
         brainIsSet = true;
