@@ -14,13 +14,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow),
     connectionForm(this),
     logsForm(this),
-    client(Util::getLineFromConf("ip"), Util::getLineFromConf("port").toInt()),
-    isWorking(false),
     controlForm(this),
     localForm(this),
+    client(Util::getLineFromConf("ip"),
+           Util::getLineFromConf("port").toInt()),
     timerRefresh(this),
-    timerSendBrain(this),
-    jobId("0")
+    timerSendBrain(this)
 {
     // UI
     ui->setupUi(this);
@@ -48,9 +47,9 @@ MainWindow::MainWindow(QWidget *parent) :
     QObject::connect(&client, SIGNAL(disconnected()),
                      this, SLOT(onDisconnected()));
     QObject::connect(&client,
-                     SIGNAL(jobReceived(int,QString,QString)),
+                     SIGNAL(jobReceived(QString,QString,QString)),
                      this,
-                     SLOT(onJobReceived(int,QString,QString)));
+                     SLOT(onJobReceived(QString,QString,QString)));
     QObject::connect(&client,
                      SIGNAL(timeoutConnect()),
                      this,
@@ -63,10 +62,6 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(brainReceived(QString)),
                      this,
                      SLOT(setBrain(QString)));
-    QObject::connect(&client,
-                     SIGNAL(jobIdReceived(QString)),
-                     this,
-                     SLOT(onJobIdReceived(QString)));
     // Local
     QObject::connect(localForm.ui->buttonLocalTraining,
                      SIGNAL(clicked()),
@@ -229,21 +224,11 @@ void MainWindow::onLogged()
 {
     connectionForm.ui->buttonConnect->setVisible(false);
     connectionForm.ui->buttonDisconnect->setVisible(true);
-    if(!isWorking)
-    {
-        client.askJobId();
-    }
-}
-
-void MainWindow::onJobIdReceived(QString jobId)
-{
-    this->jobId = jobId;
-    client.askProblems(jobId);
-    client.askBrain(jobId);
+    client.askJob();
 }
 
 
-void MainWindow::startTraining(int id,
+void MainWindow::startTraining(QString jobId,
                                QString trainingSetJson,
                                QString bestBrainJson)
 {
@@ -251,7 +236,7 @@ void MainWindow::startTraining(int id,
     int brainCount = Util::getLineFromConf("brainCount").toInt();
     if(ok)
     {
-        job = new Job(id, trainingSetJson, bestBrainJson, brainCount, ok);
+        job = new Job(jobId, trainingSetJson, bestBrainJson, brainCount, ok);
     }
     if(ok)
     {
@@ -341,6 +326,7 @@ void MainWindow::trainLocally()
     QString trainingSet;
     QFile file(Util::getLineFromConf("trainingSetFilename"));
     QString bestBrain;
+    QString jobId("local");
     //
     if(ok && !file.open(QFile::ReadOnly))
     {
@@ -364,7 +350,7 @@ void MainWindow::trainLocally()
     {
         bestBrain = file.readAll();
         file.close();
-        startTraining(42, trainingSet, bestBrain);
+        startTraining(jobId, trainingSet, bestBrain);
     }
 }
 
@@ -395,11 +381,11 @@ void MainWindow::saveBrain()
 }
 
 
-void MainWindow::onJobReceived(int id,
+void MainWindow::onJobReceived(QString jobId,
                                QString problemsJson,
                                QString bestBrainJson)
 {
-    startTraining(id, problemsJson, bestBrainJson);
+    startTraining(jobId, problemsJson, bestBrainJson);
     timerSendBrain.start(Util::getLineFromConf("intervalSendBrain").toInt());
 }
 
@@ -411,7 +397,7 @@ void MainWindow::sendBrain()
 
 void MainWindow::askBrain()
 {
-    client.askBrain(jobId);
+    client.askBrain(job->getId());
 }
 
 

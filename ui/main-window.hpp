@@ -37,7 +37,6 @@ private slots:
     void onDisconnected();
     void onLoginRefused();
     void onLogged();
-    void onJobIdReceived(QString jobId);
 
     void setMutationFrequencyAuto(bool value);
     void setMutationFrequency(double value);
@@ -56,7 +55,7 @@ private slots:
     void solveLocally();
     void saveBrain();
 
-    void onJobReceived(int id,
+    void onJobReceived(QString jobId,
                        QString problemsJson,
                        QString bestBrainJson);
 
@@ -67,7 +66,7 @@ private slots:
 private:
 
     void addLog(const QString & message);
-    void startTraining(int id,
+    void startTraining(QString jobId,
                        QString trainingSetJson,
                        QString bestBrainJson);
 
@@ -80,10 +79,7 @@ private:
     ControlForm controlForm;
     LocalForm localForm;
     Client client;
-    bool isWorking;
     Job * job;
     QTimer timerRefresh;
     QTimer timerSendBrain;
-
-    QString jobId;
 };

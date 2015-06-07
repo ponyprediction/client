@@ -14,7 +14,7 @@ Job::Job() : QObject()
 
 }
 
-Job::Job(const int & id,
+Job::Job(const QString & id,
          const QString & trainingSetJson,
          const QString & brainJson,
          const int & brainCount,
@@ -33,17 +33,17 @@ Job::Job(const int & id,
     mutexAverageRatio(),
     mutexBestBrain(),
     mutationFrequency(Util::getLineFromConf("mutationFrequency").toFloat()),
+    mutationFrequencyAuto(Util::getLineFromConf("mutationFrequencyAuto").toInt()),
     mutationFrequencyUp(Util::getLineFromConf("mutationFrequencyUp").toFloat()),
     mutationFrequencyDown(Util::getLineFromConf("mutationFrequencyDown").toFloat()),
     mutationFrequencyMax(Util::getLineFromConf("mutationFrequencyMax").toFloat()),
     mutationFrequencyMin(Util::getLineFromConf("mutationFrequencyMin").toFloat()),
-    mutationFrequencyAuto(Util::getLineFromConf("mutationFrequencyAuto").toInt()),
     mutationIntensity(Util::getLineFromConf("mutationIntensity").toFloat()),
+    mutationIntensityAuto(Util::getLineFromConf("mutationIntensityAuto").toInt()),
     mutationIntensityUp(Util::getLineFromConf("mutationIntensityUp").toFloat()),
     mutationIntensityDown(Util::getLineFromConf("mutationIntensityDown").toFloat()),
     mutationIntensityMax(Util::getLineFromConf("mutationIntensityMax").toFloat()),
-    mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat()),
-    mutationIntensityAuto(Util::getLineFromConf("mutationIntensityAuto").toInt())
+    mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat())
 {
     if(ok)
     {

@@ -59,7 +59,7 @@ void Client::log(QString username, QString password)
     handleRequest("log " + username + " " + password);
 }
 
-void Client::askJobId()
+void Client::askJob()
 {
     handleRequest("getjobid");
 }
@@ -137,7 +137,7 @@ void Client::handleAnswer(QString answer)
         if(!brainIsSet && trainingSetIsSet)
         {
             brainIsSet = true;
-            emit jobReceived(0, trainingSetJson, brainJson);
+            emit jobReceived(jobId, trainingSetJson, brainJson);
         }
         else if(brainIsSet && trainingSetIsSet)
         {
@@ -146,8 +146,9 @@ void Client::handleAnswer(QString answer)
     }
     else if(answer.startsWith("jobid "))
     {
-        QString jobId = answer.remove(0,4);
-        emit jobIdReceived(jobId);
+        jobId = answer.remove(0,4);
+        askProblems(jobId);
+        askBrain(jobId);
     }
 }
 

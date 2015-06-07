@@ -21,7 +21,7 @@ public:
     void disconnect();
     void log(QString username, QString password);
 
-    void askJobId();
+    void askJob();
     void askProblems(const QString & jobId);
     void askBrain(const QString & jobId);
     void sendBrain(QString brain);
@@ -33,7 +33,7 @@ signals:
     void loginRefused();
     void logged();
     void disconnected();
-    void jobReceived(int id,
+    void jobReceived(QString jobId,
                      QString problemsJson,
                      QString bestBrainJson);
     void brainSentSuccessfully();
@@ -64,6 +64,8 @@ private:
     QString currentAnswer;
 
     QTimer timerConnect;
+
+    QString jobId;
 };
 
 #endif // CLIENT_HPP

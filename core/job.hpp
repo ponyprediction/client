@@ -15,7 +15,7 @@ class Job : public QObject
 public:
 
     Job();
-    Job(const int & id,
+    Job(const QString & id,
         const QString & trainingSetJson,
         const QString & brainJson,
         const int & brainCount,
@@ -58,10 +58,10 @@ public:
 
     float getBestRatio();
     float getAverageRatio();
-
     QString getBestBrain();
-
     void setBrain(const QString & brainJson);
+
+    QString getId(){return id;}
 
 private:
 
@@ -77,7 +77,7 @@ private:
     void upMutationIntenstity();
     void downMutationIntenstity();
 
-    int id;
+    QString id;
     QVector<Problem*> problems;
     Brain bestBrain;
     QVector<Brain*> brains;
