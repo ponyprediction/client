@@ -21,8 +21,9 @@ public:
     void disconnect();
     void log(QString username, QString password);
 
-    void askProblems();
-    void askBrain();
+    void askJobId();
+    void askProblems(const QString & jobId);
+    void askBrain(const QString & jobId);
     void sendBrain(QString brain);
 
 signals:
@@ -33,8 +34,11 @@ signals:
     void logged();
     void disconnected();
     void jobReceived(int id,
-                     QString problems,
-                     QString bestBrain);
+                     QString problemsJson,
+                     QString bestBrainJson);
+    void brainSentSuccessfully();
+    void brainReceived(QString brainJson);
+    void jobIdReceived(QString jobId);
 
 private slots:
 

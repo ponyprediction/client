@@ -68,6 +68,7 @@ void Brain::run()
     }
 }
 
+
 void Brain::compute(const QVector<float> & inputs)
 {
     for(int i = 0 ; i < this->inputs.size() ; i++)
@@ -83,6 +84,7 @@ void Brain::compute(const QVector<float> & inputs)
     }
 }
 
+
 void Brain::prepareResult()
 {
     result = -1;
@@ -97,6 +99,7 @@ void Brain::prepareResult()
     }
 }
 
+
 void Brain::learn(const int & wantedResult)
 {
     attempts++;
@@ -104,6 +107,7 @@ void Brain::learn(const int & wantedResult)
         score += 1.0f;
     ratio = score / (float)attempts;
 }
+
 
 void Brain::mutate(float mutationFrequency, float mutationIntensity)
 {
@@ -159,11 +163,18 @@ QString Brain::getJson()
     return jsonStr;
 }
 
+
 QString Brain::getPrediction(const QVector<float> & inputs)
 {
     compute(inputs);
     prepareResult();
     return QString::number(result);
+}
+
+
+void Brain::stop()
+{
+    go = false;
 }
 
 
@@ -226,6 +237,11 @@ void Brain::load(const QJsonObject & json)
         {
             neuronBlueprints.push_back(NeuronBlueprint(neurarr[i].toObject()));
         }
+    }
+    // ratio
+    if(ok)
+    {
+        ratio = json["ratio"].toString().toDouble();
     }
 }
 

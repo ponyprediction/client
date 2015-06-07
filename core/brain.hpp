@@ -30,6 +30,8 @@ public:
 
     QString getPrediction(const QVector<float> & inputs);
 
+    void stop();
+
 private:
 
     void compute(const QVector<float> & inputs);

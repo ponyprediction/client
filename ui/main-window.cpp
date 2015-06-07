@@ -19,7 +19,8 @@ MainWindow::MainWindow(QWidget *parent) :
     controlForm(this),
     localForm(this),
     timerRefresh(this),
-    timerSendBrain(this)
+    timerSendBrain(this),
+    jobId("0")
 {
     // UI
     ui->setupUi(this);
@@ -50,11 +51,22 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(jobReceived(int,QString,QString)),
                      this,
                      SLOT(onJobReceived(int,QString,QString)));
-
     QObject::connect(&client,
                      SIGNAL(timeoutConnect()),
                      this,
                      SLOT(onTimeoutConnect()));
+    QObject::connect(&client,
+                     SIGNAL(brainSentSuccessfully()),
+                     this,
+                     SLOT(askBrain()));
+    QObject::connect(&client,
+                     SIGNAL(brainReceived(QString)),
+                     this,
+                     SLOT(setBrain(QString)));
+    QObject::connect(&client,
+                     SIGNAL(jobIdReceived(QString)),
+                     this,
+                     SLOT(onJobIdReceived(QString)));
     // Local
     QObject::connect(localForm.ui->buttonLocalTraining,
                      SIGNAL(clicked()),
@@ -219,9 +231,15 @@ void MainWindow::onLogged()
     connectionForm.ui->buttonDisconnect->setVisible(true);
     if(!isWorking)
     {
-        client.askProblems();
-        client.askBrain();
+        client.askJobId();
     }
+}
+
+void MainWindow::onJobIdReceived(QString jobId)
+{
+    this->jobId = jobId;
+    client.askProblems(jobId);
+    client.askBrain(jobId);
 }
 
 
@@ -388,6 +406,18 @@ void MainWindow::onJobReceived(int id,
 void MainWindow::sendBrain()
 {
     client.sendBrain(job->getBestBrain());
+}
+
+
+void MainWindow::askBrain()
+{
+    client.askBrain(jobId);
+}
+
+
+void MainWindow::setBrain(QString brainJson)
+{
+    job->setBrain(brainJson);
 }
 
 

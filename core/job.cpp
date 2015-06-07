@@ -289,6 +289,7 @@ float Job::getBestRatio()
 {
     mutexBestBrain.lock();
     float ratio = bestBrain.getRatio();
+    //qDebug() << ratio;
     mutexBestBrain.unlock();
     return ratio;
 }
@@ -309,6 +310,34 @@ QString Job::getBestBrain()
     QString str = bestBrain.getJson();
     mutexBestBrain.unlock();
     return str;
+}
+
+void Job::setBrain(const QString & brainJson)
+{
+    bool ok = true;
+    // Stop
+    for(int i = 0 ; i < brains.size() ; i++)
+    {
+        brains[i]->stop();
+    }
+    for(int i = 0 ; i < brains.size() ; i++)
+    {
+        while (!brains[i]->isFinished())
+        {
+            QThread::msleep(10);
+        }
+        delete brains[i];
+    }
+    //
+    if(ok)
+    {
+        loadBrains(brainJson, ok);
+    }
+    //
+    if(ok)
+    {
+        start();
+    }
 }
 
 

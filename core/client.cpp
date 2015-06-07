@@ -59,16 +59,21 @@ void Client::log(QString username, QString password)
     handleRequest("log " + username + " " + password);
 }
 
-
-void Client::askProblems()
+void Client::askJobId()
 {
-    handleRequest("gettrainingset");
+    handleRequest("getjobid");
 }
 
 
-void Client::askBrain()
+void Client::askProblems(const QString & jobId)
 {
-    handleRequest("getbrain");
+    handleRequest("gettrainingset " + jobId);
+}
+
+
+void Client::askBrain(const QString & jobId)
+{
+    handleRequest("getbrain " + jobId);
 }
 
 
@@ -117,6 +122,10 @@ void Client::handleAnswer(QString answer)
         emit loginRefused();
         disconnect();
     }
+    else if(answer == "brainreceived")
+    {
+        emit brainSentSuccessfully();
+    }
     else if(answer.startsWith("trainingset "))
     {
         trainingSetJson = answer.remove(0,12);
@@ -125,15 +134,20 @@ void Client::handleAnswer(QString answer)
     else if(answer.startsWith("brain "))
     {
         brainJson = answer.remove(0,6);
-        brainIsSet = true;
-        if(brainIsSet && trainingSetIsSet)
+        if(!brainIsSet && trainingSetIsSet)
         {
+            brainIsSet = true;
             emit jobReceived(0, trainingSetJson, brainJson);
-            brainIsSet = false;
+        }
+        else if(brainIsSet && trainingSetIsSet)
+        {
+            emit brainReceived(brainJson);
         }
     }
-    else if(answer == "brainreceived")
+    else if(answer.startsWith("jobid "))
     {
+        QString jobId = answer.remove(0,4);
+        emit jobIdReceived(jobId);
     }
 }
 

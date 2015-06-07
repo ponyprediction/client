@@ -30,12 +30,7 @@ void Neuron::compute()
 {
     float absoluteWeight = 0.0f;
     output = 0.0f;
-    QVector<float*> inputs = externalInputs + neuronalInputs + brainalInputs;
-
-    /*if(inputs.size() != weights.size())
-    {
-        qDebug() <<"problem" << inputs.size() << weights.size();
-    }*/
+    QVector<float*> inputs = externalInputs + neuronalInputs + brainalInputs;  
     for(int i = 0 ; i < inputs.size() && i <weights.size(); i++)
     {
         output += (*inputs[i]) * (*weights[i]);

@@ -37,6 +37,7 @@ private slots:
     void onDisconnected();
     void onLoginRefused();
     void onLogged();
+    void onJobIdReceived(QString jobId);
 
     void setMutationFrequencyAuto(bool value);
     void setMutationFrequency(double value);
@@ -60,6 +61,8 @@ private slots:
                        QString bestBrainJson);
 
     void sendBrain();
+    void askBrain();
+    void setBrain(QString brainJson);
 
 private:
 
@@ -81,4 +84,6 @@ private:
     Job * job;
     QTimer timerRefresh;
     QTimer timerSendBrain;
+
+    QString jobId;
 };

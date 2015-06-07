@@ -61,6 +61,8 @@ public:
 
     QString getBestBrain();
 
+    void setBrain(const QString & brainJson);
+
 private:
 
     void loadProblems(const QString & trainingSetJson, bool & ok);
