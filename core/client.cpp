@@ -146,7 +146,7 @@ void Client::handleAnswer(QString answer)
     }
     else if(answer.startsWith("jobid "))
     {
-        jobId = answer.remove(0,4);
+        jobId = answer.remove(0,6);
         askProblems(jobId);
         askBrain(jobId);
     }
