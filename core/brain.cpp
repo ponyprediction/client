@@ -150,7 +150,7 @@ QString Brain::getJson()
     // Ratio
     if(ok)
     {
-        json["ratio"] = QString::number(ratio, 'f', 6);
+        json["ratio"] = ratio;
     }
     //
     if(ok)
@@ -241,7 +241,7 @@ void Brain::load(const QJsonObject & json)
     // ratio
     if(ok)
     {
-        ratio = json["ratio"].toString().toDouble();
+        ratio = json["ratio"].toDouble();
     }
 }
 
