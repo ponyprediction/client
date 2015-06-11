@@ -23,6 +23,7 @@ public:
     ~Job();
 
     void start();
+    void stop();
     void evaluate(Brain * brain);
     void saveBestBrain(const QString & fileName);
 

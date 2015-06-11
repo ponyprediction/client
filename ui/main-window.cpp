@@ -241,7 +241,6 @@ void MainWindow::startTraining(QString jobId,
     if(ok)
     {
         job->start();
-
         connectionForm.setVisible(false);
         ui->mainWidget->layout()->removeWidget(&connectionForm);
         localForm.setVisible(false);
@@ -418,4 +417,19 @@ void MainWindow::onDisconnected()
     connectionForm.ui->lineEditUsername->setEnabled(true);
     connectionForm.ui->lineEditPassword->setEnabled(true);
     connectionForm.ui->buttonConnect->setEnabled(true);
+    connectionForm.ui->buttonConnect->setVisible(true);
+    connectionForm.ui->buttonDisconnect->setVisible(false);
+    if(job)
+    {
+        timerRefresh.stop();
+        timerSendBrain.stop();
+        connectionForm.setVisible(true);
+        ui->mainWidget->layout()->addWidget(&connectionForm);
+        localForm.setVisible(true);
+        ui->mainWidget->layout()->addWidget(&localForm);
+        controlForm.setVisible(false);
+        ui->mainWidget->layout()->removeWidget(&controlForm);
+        job->stop();
+        delete job;
+    }
 }

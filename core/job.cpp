@@ -69,6 +69,23 @@ void Job::start()
     }
 }
 
+void Job::stop()
+{
+    qDebug() << brains.size();
+    for(int i = 0 ; i < brains.size() ; i++)
+    {
+        brains[i]->stop();
+    }
+    for(int i = 0 ; i < brains.size() ; i++)
+    {
+        while (!brains[i]->isFinished())
+        {
+            QThread::msleep(10);
+        }
+        delete brains[i];
+    }
+}
+
 
 void Job::loadProblems(const QString & trainingSetJson, bool & ok)
 {
@@ -316,18 +333,7 @@ void Job::setBrain(const QString & brainJson)
 {
     bool ok = true;
     // Stop
-    for(int i = 0 ; i < brains.size() ; i++)
-    {
-        brains[i]->stop();
-    }
-    for(int i = 0 ; i < brains.size() ; i++)
-    {
-        while (!brains[i]->isFinished())
-        {
-            QThread::msleep(10);
-        }
-        delete brains[i];
-    }
+    stop();
     //
     if(ok)
     {

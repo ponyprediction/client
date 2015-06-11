@@ -24,6 +24,7 @@ Client::Client(QString ip, int port) :
                      this, SLOT(onDisconnected()));
     QObject::connect(&timerConnect, SIGNAL(timeout()),
                      this, SLOT(onTimeoutConnect()));
+    //tcpSocket.
 }
 
 
@@ -91,6 +92,8 @@ void Client::handleRequest(QString request)
 
 void Client::onDisconnected()
 {
+    brainIsSet = false;
+    trainingSetIsSet = false;
     emit disconnected();
 }
 
