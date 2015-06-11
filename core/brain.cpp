@@ -94,7 +94,7 @@ void Brain::prepareResult()
         if(outputs[i] > ratioBest)
         {
             ratioBest = outputs[i];
-            result = i-1;
+            result = i+1;
         }
     }
 }
