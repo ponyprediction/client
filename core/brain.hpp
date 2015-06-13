@@ -20,7 +20,7 @@ class Brain : public QThread
 public:
 
     Brain();
-    Brain(Job * job, const int & id, const QJsonObject & json);
+    Brain(Job * job, const int & id, const QJsonObject & json, const int & seed);
     ~Brain();
     void start(QVector<Problem*> * problems);
     const float & getRatio(){return ratio;}
@@ -69,5 +69,7 @@ private:
     float ratio;
 
     QJsonObject json;
+
+    int seed;
 
 };

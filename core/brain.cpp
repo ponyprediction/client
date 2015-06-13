@@ -28,11 +28,12 @@ Brain::Brain() :
 
 }
 
-Brain::Brain(Job * job, const int & id, const QJsonObject & json) :
+Brain::Brain(Job * job, const int & id, const QJsonObject & json, const int & seed) :
     Brain()
 {
     this->id = id;
     this->job = job;
+    this->seed = seed;
     load(json);
     initNeurons();
 }
@@ -52,6 +53,9 @@ void Brain::run()
 {
     go = true;
     currentProblemId = 0;
+    //
+    qsrand(seed);
+
     while(go)
     {
         //

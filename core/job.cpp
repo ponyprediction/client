@@ -137,7 +137,7 @@ void Job::loadBrains(const QString & brainJson, bool & ok)
         brains.clear();
         for(int i = 0 ; i < brainCount ; i++)
         {
-            brains.push_back(new Brain(this, i+1, jsonDoc.object()));
+            brains.push_back(new Brain(this, i+1, jsonDoc.object(), qrand()));
         }
         copyToBestBrain(brains[0]);
         mutexBestBrain.lock();
@@ -197,7 +197,7 @@ QString Job::getPrediction(QString problemsJson, QString brainJson, bool & ok)
     QString prediction;
     // Brain
     Brain brain(nullptr, 0,
-                QJsonDocument::fromJson(brainJson.toUtf8()).object());
+                QJsonDocument::fromJson(brainJson.toUtf8()).object(), qrand());
     // Problems
     if(ok)
     {
