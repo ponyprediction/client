@@ -45,13 +45,13 @@ void Util::init(MainWindow * mainWindow)
 }
 
 
-QString Util::getLineFromConf(const QString &id)
+QString Util::getLineFromConf(const QString & id, bool * ok)
 {
     QString output = "";
     QFile file(configFileName);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        Util::writeError("Can not find the conf file at : "
+        Util::writeError("can not find the conf file "
                          + QFileInfo(file).absoluteFilePath());
         return QString();
     }
@@ -69,10 +69,16 @@ QString Util::getLineFromConf(const QString &id)
     }
     if(!output.size())
     {
-        Util::writeError("Can not find '" + id + "' in conf file.");
+        if(ok)
+        {
+            *ok = false;
+        }
+        Util::writeError("can not find config line <" + id + ">");
     }
     return output;
 }
+
+
 float Util::getRandomFloat(const float &min, const float &max)
 {
     return ((static_cast <float>(qrand()))

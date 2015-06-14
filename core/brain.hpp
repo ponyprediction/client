@@ -35,8 +35,9 @@ public:
 private:
 
     void compute(const QVector<float> & inputs);
-    void prepareResult();
+    void prepareResults();
     void learn(const int & wantedResult);
+    void learnSingleShow(const QVector<int> & wantedResults, const int & count);
     void autoEvaluate();
     void run();
     void load(const QJsonObject & json);
@@ -62,7 +63,7 @@ private:
     int currentProblemId;
     int id;
 
-    int result; // = winnnerId
+    QVector<float> results; // = winnnerId
 
     float attempts;
     float score;

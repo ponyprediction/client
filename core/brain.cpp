@@ -58,10 +58,11 @@ void Brain::run()
 
     while(go)
     {
-        //
         compute(problems->at(currentProblemId)->getInputs());
-        prepareResult();
-        learn(problems->at(currentProblemId)->getWantedOutput());
+        prepareResults();
+        //learn(problems->at(currentProblemId)->getWantedOutput());
+        learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
+                        problems->at(currentProblemId)->getCount());
         //
         currentProblemId++;
         currentProblemId%=problems->size();
@@ -76,11 +77,17 @@ void Brain::run()
 void Brain::compute(const QVector<float> & inputs)
 {
     for(int i = 0 ; i < this->inputs.size() ; i++)
+    {
         this->inputs[i] = 0.0f;
+    }
     for(int i = 0 ; i < inputs.size() && i < this->inputs.size() ; i++)
+    {
         this->inputs[i] = inputs[i];
+    }
     for(int i = 0 ; i < neurons.size() ; i++)
+    {
         neurons[i].compute();
+    }
     for(int i = 0 ; i < outputCount ; i++)
     {
         int i2 = (neurons.size() - outputs.size()) + i;
@@ -89,9 +96,9 @@ void Brain::compute(const QVector<float> & inputs)
 }
 
 
-void Brain::prepareResult()
+void Brain::prepareResults()
 {
-    result = -1;
+    /*result = -1;
     float ratioBest = -1.0f;
     for(int i = 0 ; i < outputs.size() ; i++)
     {
@@ -100,15 +107,72 @@ void Brain::prepareResult()
             ratioBest = outputs[i];
             result = i+1;
         }
+    }*/
+
+    bool ok = true;
+    // New
+    //QJsonArray outputs;
+    //QJsonObject prediction;
+    QVector<float> sortedRatios;
+    QVector<float> sortedIds;
+    QVector<float> ratios = this->outputs;
+    int size = ratios.size();
+    float lastRatioBest = 1.0f;
+    for(int i = 0 ; i < size ; i++)
+    {
+        float ratioBest = -1.0f;
+        int idBest = 0;
+        for(int j = 0 ; j < ratios.size() ; j++)
+        {
+            if(ratios[j] > ratioBest)
+            {
+                ratioBest = ratios[j];
+                idBest = j;
+            }
+        }
+        lastRatioBest = ratioBest;
+        sortedRatios << ratios.at(idBest);
+        sortedIds << idBest+1;
+        ratios[idBest] = -1.0f;
     }
+
+    results = sortedIds;
+
+
 }
 
 
 void Brain::learn(const int & wantedResult)
 {
     attempts++;
-    if(result == wantedResult)
+    if(results[0] == wantedResult)
+    {
         score += 1.0f;
+    }
+    ratio = score / (float)attempts;
+}
+
+
+void Brain::learnSingleShow(const QVector<int> & wantedResults, const int & count)
+{
+    attempts++;
+    if(count > 7)
+    {
+        if(results[0] == wantedResults[0]
+                || results[0] == wantedResults[1]
+                || results[0] == wantedResults[2])
+        {
+            score += 1.0f;
+        }
+    }
+    else
+    {
+        if(results[0] == wantedResults[0]
+                || results[0] == wantedResults[1])
+        {
+            score += 1.0f;
+        }
+    }
     ratio = score / (float)attempts;
 }
 
@@ -171,8 +235,8 @@ QString Brain::getJson()
 QString Brain::getPrediction(const QVector<float> & inputs)
 {
     compute(inputs);
-    prepareResult();
-    return QString::number(result);
+    prepareResults();
+    return QString::number(results[0]);
 }
 
 

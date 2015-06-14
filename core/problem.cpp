@@ -25,6 +25,9 @@ void Problem::load(const QJsonObject & json, const int & inputCount)
     wantedOutputs.clear();
     //
     QStringList inputsList = json["inputs"].toString().split(';');
+
+    count = inputsList.size() / 4;
+
     for(int i = 0 ; i < inputsList.size() ; i++)
     {
         inputs.push_back(inputsList[i].toFloat());

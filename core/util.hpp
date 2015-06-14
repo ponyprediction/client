@@ -37,7 +37,7 @@ class Util
 public:
 
     static void init(MainWindow * mainWindow);
-    static QString getLineFromConf(const QString &id);
+    static QString getLineFromConf(const QString &id, bool * ok = 0);
     static float getRandomFloat(const float & min, const float & max);
     static int getRandomInt(const int & min, const int & max);
 

@@ -71,7 +71,6 @@ void Job::start()
 
 void Job::stop()
 {
-    qDebug() << brains.size();
     for(int i = 0 ; i < brains.size() ; i++)
     {
         brains[i]->stop();
@@ -93,7 +92,14 @@ void Job::loadProblems(const QString & trainingSetJson, bool & ok)
     QJsonDocument json;
     QJsonArray problemsJsonArray;
     problems.clear();
+    int minPonyCount = 1;
+    int maxPonyCount = 20;
     //
+    if(ok)
+    {
+        minPonyCount = Util::getLineFromConf("minPonyCount", &ok).toInt();
+        maxPonyCount = Util::getLineFromConf("maxPonyCount", &ok).toInt();
+    }
     if(ok)
     {
         json = QJsonDocument::fromJson(trainingSetJson.toUtf8());
@@ -114,6 +120,18 @@ void Job::loadProblems(const QString & trainingSetJson, bool & ok)
             problems.push_back(new Problem(
                                    problemsJsonArray[i].toObject(), inputCount));
         }
+        for(int i = 0 ; i < problems.size() ; i++)
+        {
+            if(!(minPonyCount <= problems.at(i)->getCount()
+                 && problems.at(i)->getCount() <= maxPonyCount))
+            {
+                problems.removeAt(i);
+                i--;
+            }
+        }
+        Util::write("Working on "
+                    + QString::number(problems.size())
+                    + " problems after filtering");
     }
 }
 
@@ -306,7 +324,6 @@ float Job::getBestRatio()
 {
     mutexBestBrain.lock();
     float ratio = bestBrain.getRatio();
-    //qDebug() << ratio;
     mutexBestBrain.unlock();
     return ratio;
 }
@@ -423,7 +440,7 @@ void Job::copyToBestBrain(Brain * brain)
     bestBrain.neurons = QVector<Neuron>();
     bestBrain.inputs = QVector<float>(brain->inputCount, 0.0f);
     bestBrain.neuronBlueprints = brain->neuronBlueprints;
-    bestBrain.result = -1;
+    bestBrain.results.clear();
     bestBrain.score = brain->score;
     bestBrain.attempts = brain->attempts;
     bestBrain.ratio = brain->ratio;
@@ -441,7 +458,7 @@ void Job::copyFromBestBrain(Brain * brain)
     brain->neurons = QVector<Neuron>();
     brain->inputs = QVector<float>(bestBrain.inputCount, 0.0f);
     brain->neuronBlueprints = bestBrain.neuronBlueprints;
-    brain->result =-1;
+    brain->results.clear();
     brain->score = 0;
     brain->attempts = 0;
     brain->ratio = 0;
