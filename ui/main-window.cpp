@@ -230,13 +230,14 @@ void MainWindow::onLogged()
 
 void MainWindow::startTraining(QString jobId,
                                QString trainingSetJson,
-                               QString bestBrainJson)
+                               QString bestBrainJson,
+                               Brain::Mode mode)
 {
     bool ok = true;
     int brainCount = Util::getLineFromConf("brainCount").toInt();
     if(ok)
     {
-        job = new Job(jobId, trainingSetJson, bestBrainJson, brainCount, ok);
+        job = new Job(jobId, trainingSetJson, bestBrainJson, brainCount, ok, mode);
     }
     if(ok)
     {
@@ -254,16 +255,41 @@ void MainWindow::startTraining(QString jobId,
 
 void MainWindow::solve(QString problemsJson, QString brainJson)
 {
+    (void) problemsJson;
+    (void) brainJson;
     bool ok = true;
     QString str;
+    Brain::Mode mode = Brain::SINGLE_SHOW;
+    QString modeStr;
     if(ok)
     {
-        str = Job::getPrediction(problemsJson, brainJson, ok);
+        modeStr = Util::getLineFromConf("mode", &ok);
+    }
+    if(ok)
+    {
+        if(modeStr == "single-win")
+        {
+            mode = Brain::SINGLE_WIN;
+        }
+        else if(modeStr == "single-show")
+        {
+            mode = Brain::SINGLE_SHOW;
+        }
+        else
+        {
+            ok = false;
+            Util::writeError("invalid mode : " + modeStr);
+        }
+    }
+    if(ok)
+    {
+        str = Job::getPrediction(problemsJson, brainJson, ok, mode);
     }
     if(ok)
     {
         Util::write("Prediction : " + str);
     }
+    Util::write("not done");
 }
 
 
@@ -326,7 +352,29 @@ void MainWindow::trainLocally()
     QFile file(Util::getLineFromConf("trainingSetFilename"));
     QString bestBrain;
     QString jobId("local");
+    Brain::Mode mode = Brain::SINGLE_SHOW;
+    QString modeStr;
     //
+    if(ok)
+    {
+        modeStr = Util::getLineFromConf("mode", &ok);
+    }
+    if(ok)
+    {
+        if(modeStr == "single-win")
+        {
+            mode = Brain::SINGLE_WIN;
+        }
+        else if(modeStr == "single-show")
+        {
+            mode = Brain::SINGLE_SHOW;
+        }
+        else
+        {
+            ok = false;
+            Util::writeError("invalid mode : " + modeStr);
+        }
+    }
     if(ok && !file.open(QFile::ReadOnly))
     {
         ok = false;
@@ -349,7 +397,7 @@ void MainWindow::trainLocally()
     {
         bestBrain = file.readAll();
         file.close();
-        startTraining(jobId, trainingSet, bestBrain);
+        startTraining(jobId, trainingSet, bestBrain, mode);
     }
 }
 
@@ -384,8 +432,36 @@ void MainWindow::onJobReceived(QString jobId,
                                QString problemsJson,
                                QString bestBrainJson)
 {
-    startTraining(jobId, problemsJson, bestBrainJson);
-    timerSendBrain.start(Util::getLineFromConf("intervalSendBrain").toInt());
+    bool ok = true;
+    Brain::Mode mode = Brain::SINGLE_SHOW;
+    QString modeStr;
+    /* TODO : replace with mode from server */
+    if(ok)
+    {
+        modeStr = Util::getLineFromConf("mode", &ok);
+    }
+    if(ok)
+    {
+        if(modeStr == "single-win")
+        {
+            mode = Brain::SINGLE_WIN;
+        }
+        else if(modeStr == "single-show")
+        {
+            mode = Brain::SINGLE_SHOW;
+        }
+        else
+        {
+            ok = false;
+            Util::writeError("invalid mode : " + modeStr);
+        }
+    }
+    /**/
+    if(ok)
+    {
+        startTraining(jobId, problemsJson, bestBrainJson, mode);
+        timerSendBrain.start(Util::getLineFromConf("intervalSendBrain").toInt());
+    }
 }
 
 void MainWindow::sendBrain()

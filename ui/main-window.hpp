@@ -68,7 +68,7 @@ private:
     void addLog(const QString & message);
     void startTraining(QString jobId,
                        QString trainingSetJson,
-                       QString bestBrainJson);
+                       QString bestBrainJson, Brain::Mode mode);
 
     void solve(QString problemsJson,
                QString brainJson);

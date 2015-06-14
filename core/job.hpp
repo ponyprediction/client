@@ -1,25 +1,28 @@
 #pragma once
 
+#include "brain.hpp"
+#include "core/problem.hpp"
 #include <QVector>
 #include <QMutex>
 #include <QDebug>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
-#include "brain.hpp"
-#include "core/problem.hpp"
+
 
 class Job : public QObject
 {
     Q_OBJECT
 public:
 
+
     Job();
     Job(const QString & id,
         const QString & trainingSetJson,
         const QString & brainJson,
         const int & brainCount,
-        bool & ok);
+        bool & ok,
+        const Brain::Mode & mode);
     ~Job();
 
     void start();
@@ -29,7 +32,8 @@ public:
 
     QString static getPrediction(QString problemsJson,
                                  QString brainJson,
-                                 bool & ok);
+                                 bool & ok,
+                                 Brain::Mode mode);
 
     void setMutationFrequencyAuto(bool v){mutationFrequencyAuto = v;}
     void setMutationFrequency(float v);
@@ -106,5 +110,7 @@ private:
     float mutationIntensityDown;
     float mutationIntensityMax;
     float mutationIntensityMin;
+
+    Brain::Mode mode;
 
 };

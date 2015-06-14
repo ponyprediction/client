@@ -1,4 +1,5 @@
 #include "job.hpp"
+#include "brain.hpp"
 #include "util.hpp"
 #include <QDebug>
 #include <QFile>
@@ -18,7 +19,8 @@ Job::Job(const QString & id,
          const QString & trainingSetJson,
          const QString & brainJson,
          const int & brainCount,
-         bool & ok) :
+         bool & ok,
+         const Brain::Mode & mode) :
     QObject(),
     id(id),
     problems(),
@@ -43,7 +45,8 @@ Job::Job(const QString & id,
     mutationIntensityUp(Util::getLineFromConf("mutationIntensityUp").toFloat()),
     mutationIntensityDown(Util::getLineFromConf("mutationIntensityDown").toFloat()),
     mutationIntensityMax(Util::getLineFromConf("mutationIntensityMax").toFloat()),
-    mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat())
+    mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat()),
+    mode(mode)
 {
     if(ok)
     {
@@ -155,8 +158,10 @@ void Job::loadBrains(const QString & brainJson, bool & ok)
         brains.clear();
         for(int i = 0 ; i < brainCount ; i++)
         {
-            brains.push_back(new Brain(this, i+1, jsonDoc.object(), qrand()));
+            brains.push_back(new Brain(this, i+1, jsonDoc.object(),
+                                       qrand(), mode));
         }
+        //
         copyToBestBrain(brains[0]);
         mutexBestBrain.lock();
         bestBrain.json = brains[0]->json;
@@ -171,11 +176,6 @@ void Job::evaluate(Brain * brain)
     mutexAverageRatio.lock();
     float averagetmp = averageRatio;
     mutexAverageRatio.unlock();
-    /*Util::write("Brain #" + QString::number(brain->getId())
-                + " : " + QString::number(brain->getRatio(), 'f', 6)
-                + " : " + QString::number(averagetmp, 'f', 6)
-                + " : " + QString::number(mutationFrequency, 'f', 6)
-                + " : " + QString::number(mutationIntensity, 'f', 6));*/
     if(brain->getRatio() > averagetmp)
     {
         copyToBestBrain(brain);
@@ -207,7 +207,7 @@ void Job::saveBestBrain(const QString & fileName)
 }
 
 
-QString Job::getPrediction(QString problemsJson, QString brainJson, bool & ok)
+QString Job::getPrediction(QString problemsJson, QString brainJson, bool & ok, Brain::Mode mode)
 {
     QJsonDocument json;
     QJsonArray problemsJsonArray;
@@ -215,7 +215,7 @@ QString Job::getPrediction(QString problemsJson, QString brainJson, bool & ok)
     QString prediction;
     // Brain
     Brain brain(nullptr, 0,
-                QJsonDocument::fromJson(brainJson.toUtf8()).object(), qrand());
+                QJsonDocument::fromJson(brainJson.toUtf8()).object(), qrand(), mode);
     // Problems
     if(ok)
     {

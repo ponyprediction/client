@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "core/neuron.hpp"
 #include "core/neuron-blueprint.hpp"
 #include "core/problem.hpp"
@@ -19,8 +18,15 @@ class Brain : public QThread
 
 public:
 
+    enum Mode{SINGLE_WIN, SINGLE_SHOW};
+
     Brain();
-    Brain(Job * job, const int & id, const QJsonObject & json, const int & seed);
+    Brain(Job * job,
+          const int & id,
+          const QJsonObject & json,
+          const int & seed,
+          const Brain::Mode & mode);
+
     ~Brain();
     void start(QVector<Problem*> * problems);
     const float & getRatio(){return ratio;}
@@ -36,8 +42,11 @@ private:
 
     void compute(const QVector<float> & inputs);
     void prepareResults();
-    void learn(const int & wantedResult);
+
+    void learn();
+    void learnSingleWin(const int & wantedResult);
     void learnSingleShow(const QVector<int> & wantedResults, const int & count);
+
     void autoEvaluate();
     void run();
     void load(const QJsonObject & json);
@@ -72,5 +81,7 @@ private:
     QJsonObject json;
 
     int seed;
+
+    Mode mode;
 
 };

@@ -1,9 +1,8 @@
 #include "brain.hpp"
-#include <QXmlStreamReader>
-#include <QStringList>
-#include <QDebug>
+#include "job.hpp"
 #include "core/util.hpp"
-#include "core/job.hpp"
+#include <QStringList>
+#include <QXmlStreamReader>
 
 Brain::Brain() :
     QThread(),
@@ -28,12 +27,17 @@ Brain::Brain() :
 
 }
 
-Brain::Brain(Job * job, const int & id, const QJsonObject & json, const int & seed) :
+Brain::Brain(Job * job,
+             const int & id,
+             const QJsonObject & json,
+             const int & seed,
+             const Brain::Mode & mode) :
     Brain()
 {
     this->id = id;
     this->job = job;
     this->seed = seed;
+    this->mode = mode;
     load(json);
     initNeurons();
 }
@@ -60,9 +64,7 @@ void Brain::run()
     {
         compute(problems->at(currentProblemId)->getInputs());
         prepareResults();
-        //learn(problems->at(currentProblemId)->getWantedOutput());
-        learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
-                        problems->at(currentProblemId)->getCount());
+        learn();
         //
         currentProblemId++;
         currentProblemId%=problems->size();
@@ -98,21 +100,6 @@ void Brain::compute(const QVector<float> & inputs)
 
 void Brain::prepareResults()
 {
-    /*result = -1;
-    float ratioBest = -1.0f;
-    for(int i = 0 ; i < outputs.size() ; i++)
-    {
-        if(outputs[i] > ratioBest)
-        {
-            ratioBest = outputs[i];
-            result = i+1;
-        }
-    }*/
-
-    bool ok = true;
-    // New
-    //QJsonArray outputs;
-    //QJsonObject prediction;
     QVector<float> sortedRatios;
     QVector<float> sortedIds;
     QVector<float> ratios = this->outputs;
@@ -135,14 +122,34 @@ void Brain::prepareResults()
         sortedIds << idBest+1;
         ratios[idBest] = -1.0f;
     }
-
     results = sortedIds;
-
-
 }
 
 
-void Brain::learn(const int & wantedResult)
+void Brain::learn()
+{
+    switch(mode)
+    {
+        case SINGLE_WIN:
+        {
+            learnSingleWin(problems->at(currentProblemId)->getWantedOutput());
+            break;
+        }
+        case SINGLE_SHOW:
+        {
+            learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
+                            problems->at(currentProblemId)->getCount());
+            break;
+        }
+        default:
+        {
+            Util::writeError("invalide mode in brain");
+        }
+    }
+}
+
+
+void Brain::learnSingleWin(const int & wantedResult)
 {
     attempts++;
     if(results[0] == wantedResult)
