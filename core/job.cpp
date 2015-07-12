@@ -5,6 +5,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QString>
+#include <QDir>
 
 
 int inputCount = 80;
@@ -179,6 +180,13 @@ void Job::evaluate(Brain * brain)
     if(brain->getRatio() > averagetmp)
     {
         copyToBestBrain(brain);
+    }
+    if(brain->getRatio() > bestBrainRatio)
+    {
+        bestBrainRatio = brain->getRatio();
+        QDir dir(Util::getLineFromConf("pathToBrains"));
+        QString fileName = Util::getLineFromConf("pathToBrains") + "/" + QString::number(dir.count()) +"_" + QString::number(brain->getRatio()) + ".brain";
+        saveBestBrain(fileName);
     }
     copyFromBestBrain(brain);
     brain->mutate(mutationFrequency,mutationIntensity);

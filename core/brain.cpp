@@ -130,21 +130,21 @@ void Brain::learn()
 {
     switch(mode)
     {
-        case SINGLE_WIN:
-        {
-            learnSingleWin(problems->at(currentProblemId)->getWantedOutput());
-            break;
-        }
-        case SINGLE_SHOW:
-        {
-            learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
-                            problems->at(currentProblemId)->getCount());
-            break;
-        }
-        default:
-        {
-            Util::writeError("invalide mode in brain");
-        }
+    case SINGLE_WIN:
+    {
+        learnSingleWin(problems->at(currentProblemId)->getWantedOutput());
+        break;
+    }
+    case SINGLE_SHOW:
+    {
+        learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
+                        problems->at(currentProblemId)->getCount());
+        break;
+    }
+    default:
+    {
+        Util::writeError("invalide mode in brain");
+    }
     }
 }
 

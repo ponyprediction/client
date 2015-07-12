@@ -62,6 +62,7 @@ public:
     float getMutationIntensityMax(){return mutationIntensityMax;}
 
     float getBestRatio();
+    float bestBrainRatio;
     float getAverageRatio();
     QString getBestBrain();
     void setBrain(const QString & brainJson);
