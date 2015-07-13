@@ -30,6 +30,7 @@ public:
     ~Brain();
     void start(QVector<Problem*> * problems);
     const float & getRatio(){return ratio;}
+    const float & getBalance(){return balance;}
     const int & getId(){return id;}
     void mutate(float mutationFrequency, float mutationIntensity);
     QString getJson();

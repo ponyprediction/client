@@ -62,7 +62,10 @@ public:
     float getMutationIntensityMax(){return mutationIntensityMax;}
 
     float getBestRatio();
+    float getBestBalance();
+    float getAverageBalance();
     float bestBrainRatio;
+    float bestBrainBalance;
     float getAverageRatio();
     QString getBestBrain();
     void setBrain(const QString & brainJson);
@@ -74,6 +77,7 @@ private:
     void loadProblems(const QString & trainingSetJson, bool & ok);
     void loadBrains(const QString & brainJson, bool & ok);
     void addRatio(const float & ratio);
+    void addBalance(const float & balance);
     void updateAverageRatio();
     void copyToBestBrain(Brain * brain);
     void copyFromBestBrain(Brain * brain);
@@ -91,8 +95,11 @@ private:
 
     int ratiosToSaveCount;
     QVector<float> lastNratios;
+    QVector<float> lastNbalances;
     float averageRatio;
+    float averageBalance;
     float lastAverageRatio;
+    float lastAverageBalance;
 
     QMutex mutexLastNratios;
     QMutex mutexAverageRatio;

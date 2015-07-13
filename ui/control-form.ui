@@ -285,6 +285,37 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="2">
+       <widget class="QLabel" name="labelAverageBalance">
+        <property name="text">
+         <string>Average balance:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labelBalance">
+        <property name="text">
+         <string>Balance: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="labelBalanceValue">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QLabel" name="labelAverageBalanceValue">
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>

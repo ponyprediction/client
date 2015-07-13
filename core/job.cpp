@@ -177,11 +177,27 @@ void Job::loadBrains(const QString & brainJson, bool & ok)
 
 void Job::evaluate(Brain * brain)
 {
+    addBalance(brain->getBalance());
     addRatio(brain->getRatio());
     mutexAverageRatio.lock();
     float averagetmp = averageRatio;
+    float averageBalanceTmp = averageBalance;
     mutexAverageRatio.unlock();
-    if(brain->getRatio() > averagetmp)
+    if(brain->getBalance() > averageBalanceTmp)
+    {
+        copyToBestBrain(brain);
+    }
+    if(brain->getBalance() > bestBrainBalance)
+    {
+        bestBrainBalance = brain->getBalance();
+        QDir dir(Util::getLineFromConf("pathToBrains"));
+        QString fileName = Util::getLineFromConf("pathToBrains") + "/" +
+                QString::number(dir.count()) + "_" +
+                QString::number(brain->getBalance()) + "_" +
+                QString::number(brain->getRatio()) + ".brain";
+        saveBestBrain(fileName);
+    }
+    /*if(brain->getRatio() > averagetmp)
     {
         copyToBestBrain(brain);
     }
@@ -191,7 +207,7 @@ void Job::evaluate(Brain * brain)
         QDir dir(Util::getLineFromConf("pathToBrains"));
         QString fileName = Util::getLineFromConf("pathToBrains") + "/" + QString::number(dir.count()) +"_" + QString::number(brain->getRatio()) + ".brain";
         saveBestBrain(fileName);
-    }
+    }*/
     copyFromBestBrain(brain);
     brain->mutate(mutationFrequency,mutationIntensity);
 }
@@ -340,6 +356,22 @@ float Job::getBestRatio()
     return ratio;
 }
 
+float Job::getBestBalance()
+{
+    mutexBestBrain.lock();
+    float balance = bestBrain.getBalance();
+    mutexBestBrain.unlock();
+    return balance;
+}
+
+float Job::getAverageBalance()
+{
+    mutexAverageRatio.lock();
+    float balance = averageBalance;
+    mutexAverageRatio.unlock();
+    return balance;
+}
+
 
 float Job::getAverageRatio()
 {
@@ -386,21 +418,40 @@ void Job::addRatio(const float & ratio)
     updateAverageRatio();
 }
 
+void Job::addBalance(const float &balance)
+{
+    mutexLastNratios.lock();
+    lastNbalances.push_back(balance);
+    while(lastNbalances.size() > ratiosToSaveCount)
+        lastNbalances.pop_front();
+    mutexLastNratios.unlock();
+    updateAverageRatio();
+}
+
 
 void Job::updateAverageRatio()
 {
     mutexLastNratios.lock();
     mutexAverageRatio.lock();
     lastAverageRatio = averageRatio;
+    lastAverageBalance = averageBalance;
     averageRatio = 0.0f;
+    averageBalance = 0.0f;
     for(int i = 0 ; i<lastNratios.size() ; i++)
     {
         averageRatio += lastNratios[i];
     }
+    for(int i = 0 ; i<lastNbalances.size() ; i++)
+    {
+        averageBalance += lastNbalances[i];
+    }
     averageRatio /= (float)lastNratios.size();
+    averageBalance /= (float)lastNbalances.size();
     float ratioResolution = 0.00001f;
+    float balanceResolution = 0.01f;
     float borne = 1000.0f;
-    if(lastAverageRatio > averageRatio - ratioResolution)
+    //if(lastAverageRatio > averageRatio - ratioResolution)
+    if(lastAverageBalance > averageBalance - balanceResolution)
     {
         if(mutationFrequencyAuto && mutationIntensityAuto)
         {
@@ -455,6 +506,7 @@ void Job::copyToBestBrain(Brain * brain)
     bestBrain.results.clear();
     bestBrain.score = brain->score;
     bestBrain.attempts = brain->attempts;
+    bestBrain.balance = brain->balance;
     bestBrain.ratio = brain->ratio;
     mutexBestBrain.unlock();
 }

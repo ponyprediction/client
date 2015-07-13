@@ -177,6 +177,11 @@ void MainWindow::onRefresh()
                 QString::number(job->getBestRatio(), 'f', 6));
     controlForm.ui->labelAverageRatio->setText(
                 QString::number(job->getAverageRatio(), 'f', 6));
+    // Balances
+    controlForm.ui->labelBalanceValue->setText(
+                QString::number(job->getBestBalance(), 'f', 6));
+    controlForm.ui->labelAverageBalanceValue->setText(
+                QString::number(job->getAverageBalance(), 'f', 6));
 }
 
 

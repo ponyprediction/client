@@ -195,7 +195,6 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults, const int & coun
     }
     ratio = score / (float)attempts;
     balance--;
-    qDebug() << balance;
 }
 
 
