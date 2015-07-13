@@ -45,7 +45,8 @@ private:
 
     void learn();
     void learnSingleWin(const int & wantedResult);
-    void learnSingleShow(const QVector<int> & wantedResults, const int & count);
+    void learnSingleShow(const QVector<int> & wantedResults, const int & count,
+                         const QVector<float> & gains);
 
     void autoEvaluate();
     void run();
@@ -77,6 +78,7 @@ private:
     float attempts;
     float score;
     float ratio;
+    float balance;
 
     QJsonObject json;
 

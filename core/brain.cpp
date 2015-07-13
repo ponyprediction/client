@@ -22,7 +22,8 @@ Brain::Brain() :
     attempts(0.0f),
     score(0.0f),
     ratio(0.0f),
-    json()
+    json(),
+    balance(0)
 {
 
 }
@@ -138,7 +139,8 @@ void Brain::learn()
     case SINGLE_SHOW:
     {
         learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
-                        problems->at(currentProblemId)->getCount());
+                        problems->at(currentProblemId)->getCount(),
+                        problems->at(currentProblemId)->getGains());
         break;
     }
     default:
@@ -160,7 +162,8 @@ void Brain::learnSingleWin(const int & wantedResult)
 }
 
 
-void Brain::learnSingleShow(const QVector<int> & wantedResults, const int & count)
+void Brain::learnSingleShow(const QVector<int> & wantedResults, const int & count,
+                            const QVector<float> &gains)
 {
     attempts++;
     if(count > 7)
@@ -170,6 +173,11 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults, const int & coun
                 || results[0] == wantedResults[2])
         {
             score += 1.0f;
+            for(int i = 0; i < 3 ; i ++)
+            {
+                if(results[0] == wantedResults[i])
+                    balance += gains[i];
+            }
         }
     }
     else
@@ -178,9 +186,16 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults, const int & coun
                 || results[0] == wantedResults[1])
         {
             score += 1.0f;
+            for(int i = 0; i < 2 ; i ++)
+            {
+                if(results[0] == wantedResults[i])
+                    balance += gains[i];
+            }
         }
     }
     ratio = score / (float)attempts;
+    balance--;
+    qDebug() << balance;
 }
 
 

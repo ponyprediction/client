@@ -474,6 +474,7 @@ void Job::copyFromBestBrain(Brain * brain)
     brain->score = 0;
     brain->attempts = 0;
     brain->ratio = 0;
+    brain->balance = 0;
     mutexBestBrain.unlock();
     brain->initNeurons();
 }
