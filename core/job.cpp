@@ -119,6 +119,10 @@ void Job::loadProblems(const QString & trainingSetJson, bool & ok)
     }
     if(ok)
     {
+
+    }
+    if(ok)
+    {
         for(int i = 0 ; i < problemsJsonArray.size() ; i++)
         {
             problems.push_back(new Problem(

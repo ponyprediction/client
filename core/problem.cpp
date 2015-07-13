@@ -42,5 +42,10 @@ void Problem::load(const QJsonObject & json, const int & inputCount)
     {
         wantedOutputs.push_back(wantedOutputsList[i].toInt());
     }
+    QStringList gainsList = json["gain"].toString().split(";");
+    for(int i = 0 ; i < gainsList.size() ; i++)
+    {
+        gains.push_back(gainsList[i].toFloat());
+    }
 }
 
