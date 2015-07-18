@@ -23,7 +23,8 @@ Brain::Brain() :
     score(0.0f),
     ratio(0.0f),
     json(),
-    balance(0)
+    balance(-7000)
+
 {
 
 }

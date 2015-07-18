@@ -31,6 +31,8 @@ Job::Job(const QString & id,
     ratiosToSaveCount(100),
     lastNratios(QVector<float>(100, 0.0f)),
     averageRatio(0.0f),
+    averageBalance(0),
+    lastAverageBalance(0),
     lastAverageRatio(0.0f),
     mutexLastNratios(),
     mutexAverageRatio(),
@@ -47,7 +49,10 @@ Job::Job(const QString & id,
     mutationIntensityDown(Util::getLineFromConf("mutationIntensityDown").toFloat()),
     mutationIntensityMax(Util::getLineFromConf("mutationIntensityMax").toFloat()),
     mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat()),
-    mode(mode)
+    mode(mode),
+    bestBrainBalance(-7000),
+    bestBrainRatio(0),
+    session(QDateTime::currentDateTime())
 {
     if(ok)
     {
@@ -57,6 +62,21 @@ Job::Job(const QString & id,
     {
         loadBrains(brainJson, ok);
     }
+    saveDirectory = Util::getLineFromConf("pathToBrains")
+                + "/"
+                + QString::number(session.date().year())
+                + "_"
+                + QString::number(session.date().month())
+                + "_"
+                + QString::number(session.date().day())
+                + "-"
+                + QString::number(session.time().hour())
+                + "_"
+                + QString::number(session.time().minute())
+                + "_"
+                + QString::number(session.time().second());
+    QDir directory;
+    directory.mkdir(saveDirectory);
 }
 
 Job::~Job()
@@ -189,10 +209,10 @@ void Job::evaluate(Brain * brain)
     }
     if(brain->getBalance() > bestBrainBalance)
     {
+
         bestBrainBalance = brain->getBalance();
-        QDir dir(Util::getLineFromConf("pathToBrains"));
-        QString fileName = Util::getLineFromConf("pathToBrains") + "/" +
-                QString::number(dir.count()) + "_" +
+
+        QString fileName = saveDirectory + "/" +
                 QString::number(brain->getBalance()) + "_" +
                 QString::number(brain->getRatio()) + ".brain";
         saveBestBrain(fileName);

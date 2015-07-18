@@ -8,6 +8,7 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QJsonArray>
+#include <QDateTime>
 
 
 class Job : public QObject
@@ -104,6 +105,9 @@ private:
     QMutex mutexLastNratios;
     QMutex mutexAverageRatio;
     QMutex mutexBestBrain;
+
+    QDateTime session;
+    QString saveDirectory;
 
     float mutationFrequency;
     bool mutationFrequencyAuto;
