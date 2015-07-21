@@ -163,7 +163,8 @@ void Brain::learnSingleWin(const int & wantedResult)
 }
 
 
-void Brain::learnSingleShow(const QVector<int> & wantedResults, const int & count,
+void Brain::learnSingleShow(const QVector<int> & wantedResults,
+                            const int & count,
                             const QVector<float> &gains)
 {
     attempts++;

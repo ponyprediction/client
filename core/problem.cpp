@@ -27,7 +27,7 @@ void Problem::load(const QJsonObject & json, const int & inputCount)
     QStringList inputsList = json["inputs"].toString().split(';');
 
     int inputsPerTeam = Util::getLineFromConf("inputsPerTeam").toInt();
-    count = inputsList.size() / inputsPerTeam;
+    teamCount = inputsList.size() / inputsPerTeam;
 
     for(int i = 0 ; i < inputsList.size() ; i++)
     {
