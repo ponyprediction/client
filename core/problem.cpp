@@ -1,5 +1,5 @@
 #include "problem.hpp"
-
+#include "util.hpp"
 #include <QXmlStreamReader>
 #include <QStringList>
 #include <QDebug>
@@ -26,7 +26,8 @@ void Problem::load(const QJsonObject & json, const int & inputCount)
     //
     QStringList inputsList = json["inputs"].toString().split(';');
 
-    count = inputsList.size() / 4;
+    int inputsPerTeam = Util::getLineFromConf("inputsPerTeam").toInt();
+    count = inputsList.size() / inputsPerTeam;
 
     for(int i = 0 ; i < inputsList.size() ; i++)
     {
