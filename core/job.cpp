@@ -213,8 +213,8 @@ void Job::evaluate(Brain * brain)
         bestBrainBalance = brain->getBalance();
 
         QString fileName = saveDirectory + "/" +
-                QString::number(brain->getBalance()) + "_" +
-                QString::number(brain->getRatio()) + ".brain";
+                QString::number(brain->getBalance(),'f',2) + "_" +
+                QString::number(brain->getRatio(),'f',2) + ".brain";
         saveBestBrain(fileName);
     }
     /*if(brain->getRatio() > averagetmp)
