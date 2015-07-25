@@ -126,6 +126,11 @@ MainWindow::MainWindow(QWidget *parent) :
                      SIGNAL(valueChanged(double)),
                      this,
                      SLOT(setMutationIntensityMax(double)));
+    // Training - Intensity
+    QObject::connect(controlForm.ui->doubleSpinBoxLimitDeviation,
+                     SIGNAL(valueChanged(double)),
+                     this,
+                     SLOT(setLimitDeviation(double)));
     //
     QObject::connect(&timerRefresh, SIGNAL(timeout()), this, SLOT(onRefresh()));
     QObject::connect(&timerSendBrain, SIGNAL(timeout()),
@@ -172,6 +177,9 @@ void MainWindow::onRefresh()
                 !job->getMutationIntensityAuto());
     controlForm.ui->radioButtonMutationIntensityAuto->setChecked(
                 job->getMutationIntensityAuto());
+    // Limit deviation
+    controlForm.ui->doubleSpinBoxLimitDeviation->setValue(
+                job->getLimitDeviation());
     // Ratios
     controlForm.ui->labelRatio->setText(
                 QString::number(job->getBestRatio(), 'f', 6));
@@ -182,6 +190,8 @@ void MainWindow::onRefresh()
                 QString::number(job->getBestBalance(), 'f', 6));
     controlForm.ui->labelAverageBalanceValue->setText(
                 QString::number(job->getAverageBalance(), 'f', 6));
+    controlForm.ui->labelBestBalanceValue->setText(
+                QString::number(job->getBestBalanceEver(), 'f', 6));
 }
 
 
@@ -349,6 +359,10 @@ void MainWindow::setMutationIntensityMin(double value)
     job->setMutationIntensityMin(value);
 }
 
+void MainWindow::setLimitDeviation(double value)
+{
+    job->setLimitDeviation(value);
+}
 
 void MainWindow::trainLocally()
 {

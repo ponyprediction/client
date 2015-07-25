@@ -51,6 +51,8 @@ private slots:
     void setMutationIntensityMax(double value);
     void setMutationIntensityMin(double value);
 
+    void setLimitDeviation(double value);
+
     void trainLocally();
     void solveLocally();
     void saveBrain();

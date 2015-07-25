@@ -62,11 +62,13 @@ public:
     float getMutationIntensityMin(){return mutationIntensityMin;}
     float getMutationIntensityMax(){return mutationIntensityMax;}
 
+    void setLimitDeviation(float v){limitDeviation = v;}
+    float getLimitDeviation(){return limitDeviation;}
+
     float getBestRatio();
     float getBestBalance();
+    float getBestBalanceEver();
     float getAverageBalance();
-    float bestBrainRatio;
-    float bestBrainBalance;
     float getAverageRatio();
     QString getBestBrain();
     void setBrain(const QString & brainJson);
@@ -82,6 +84,7 @@ private:
     void updateAverageRatio();
     void copyToBestBrain(Brain * brain);
     void copyFromBestBrain(Brain * brain);
+    void copyToBestBrainEver(Brain * brain);
 
     void upMutationFrequency();
     void downMutationFrequency();
@@ -91,6 +94,7 @@ private:
     QString id;
     QVector<Problem*> problems;
     Brain bestBrain;
+    Brain bestBrainEver;
     QVector<Brain*> brains;
     int brainCount;
 
@@ -105,6 +109,7 @@ private:
     QMutex mutexLastNratios;
     QMutex mutexAverageRatio;
     QMutex mutexBestBrain;
+    QMutex mutexBestBrainEver;
 
     QDateTime session;
     QString saveDirectory;
@@ -122,6 +127,11 @@ private:
     float mutationIntensityDown;
     float mutationIntensityMax;
     float mutationIntensityMin;
+
+    float limitDeviation;
+
+    //float bestRatioEver;
+    float bestBalanceEver;
 
     Brain::Mode mode;
 

@@ -78,6 +78,12 @@ ControlForm::ControlForm(QWidget *parent) :
                 Util::getLineFromConf("decimals").toFloat());
     ui->doubleSpinBoxMutationIntensityMin->setSingleStep(
                 Util::getLineFromConf("step").toFloat());
+
+    //
+    ui->doubleSpinBoxLimitDeviation->setValue(0.0f);
+    ui->doubleSpinBoxLimitDeviation->setRange(0.0f, 10000.0f);
+    ui->doubleSpinBoxLimitDeviation->setDecimals(2);
+    ui->doubleSpinBoxLimitDeviation->setSingleStep(1);
 }
 
 ControlForm::~ControlForm()

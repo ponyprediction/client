@@ -26,6 +26,7 @@ Job::Job(const QString & id,
     id(id),
     problems(),
     bestBrain(),
+    bestBrainEver(),
     brains(),
     brainCount(brainCount),
     ratiosToSaveCount(100),
@@ -37,6 +38,7 @@ Job::Job(const QString & id,
     mutexLastNratios(),
     mutexAverageRatio(),
     mutexBestBrain(),
+    mutexBestBrainEver(),
     mutationFrequency(Util::getLineFromConf("mutationFrequency").toFloat()),
     mutationFrequencyAuto(Util::getLineFromConf("mutationFrequencyAuto").toInt()),
     mutationFrequencyUp(Util::getLineFromConf("mutationFrequencyUp").toFloat()),
@@ -49,9 +51,10 @@ Job::Job(const QString & id,
     mutationIntensityDown(Util::getLineFromConf("mutationIntensityDown").toFloat()),
     mutationIntensityMax(Util::getLineFromConf("mutationIntensityMax").toFloat()),
     mutationIntensityMin(Util::getLineFromConf("mutationIntensityMin").toFloat()),
+    limitDeviation(Util::getLineFromConf("limitDeviation").toFloat()),
     mode(mode),
-    bestBrainBalance(-7000),
-    bestBrainRatio(0),
+    bestBalanceEver(-10000),
+    //bestRatioEver(0),
     session(QDateTime::currentDateTime())
 {
     if(ok)
@@ -63,18 +66,18 @@ Job::Job(const QString & id,
         loadBrains(brainJson, ok);
     }
     saveDirectory = Util::getLineFromConf("pathToBrains")
-                + "/"
-                + QString::number(session.date().year())
-                + "_"
-                + QString::number(session.date().month())
-                + "_"
-                + QString::number(session.date().day())
-                + "-"
-                + QString::number(session.time().hour())
-                + "_"
-                + QString::number(session.time().minute())
-                + "_"
-                + QString::number(session.time().second());
+            + "/"
+            + QString::number(session.date().year())
+            + "_"
+            + QString::number(session.date().month())
+            + "_"
+            + QString::number(session.date().day())
+            + "-"
+            + QString::number(session.time().hour())
+            + "_"
+            + QString::number(session.time().minute())
+            + "_"
+            + QString::number(session.time().second());
     QDir directory;
     directory.mkdir(saveDirectory);
 }
@@ -188,9 +191,13 @@ void Job::loadBrains(const QString & brainJson, bool & ok)
         }
         //
         copyToBestBrain(brains[0]);
+        copyToBestBrainEver(brains[0]);
         mutexBestBrain.lock();
         bestBrain.json = brains[0]->json;
         mutexBestBrain.unlock();
+        mutexBestBrainEver.lock();
+        bestBrainEver.json = brains[0]->json;
+        mutexBestBrainEver.unlock();
     }
 }
 
@@ -200,30 +207,29 @@ void Job::evaluate(Brain * brain)
     addBalance(brain->getBalance());
     addRatio(brain->getRatio());
     mutexAverageRatio.lock();
-    float averagetmp = averageRatio;
     float averageBalanceTmp = averageBalance;
     mutexAverageRatio.unlock();
     if(brain->getBalance() > averageBalanceTmp)
     {
         copyToBestBrain(brain);
     }
-    if(brain->getBalance() > bestBrainBalance)
+    if(brain->getBalance() > bestBalanceEver)
     {
-
-        bestBrainBalance = brain->getBalance();
-
+        copyToBestBrainEver(brain);
+        bestBalanceEver = brain->getBalance();
         QString fileName = saveDirectory + "/" +
-                QString::number(brain->getBalance(),'f',2) + "_" +
+                QString::number(brain->getBalance(),'f',2) + " | " +
                 QString::number(brain->getRatio(),'f',2) + ".brain";
         saveBestBrain(fileName);
     }
-    /*if(brain->getRatio() > averagetmp)
+    /*float averagetmp = averageRatio;
+    if(brain->getRatio() > averagetmp)
     {
         copyToBestBrain(brain);
     }
-    if(brain->getRatio() > bestBrainRatio)
+    if(brain->getRatio() > bestRatioEver)
     {
-        bestBrainRatio = brain->getRatio();
+        bestRatioEver = brain->getRatio();
         QDir dir(Util::getLineFromConf("pathToBrains"));
         QString fileName = Util::getLineFromConf("pathToBrains") + "/" + QString::number(dir.count()) +"_" + QString::number(brain->getRatio()) + ".brain";
         saveBestBrain(fileName);
@@ -384,6 +390,14 @@ float Job::getBestBalance()
     return balance;
 }
 
+float Job::getBestBalanceEver()
+{
+    mutexBestBrainEver.lock();
+    float balance = bestBrainEver.getBalance();
+    mutexBestBrainEver.unlock();
+    return balance;
+}
+
 float Job::getAverageBalance()
 {
     mutexAverageRatio.lock();
@@ -514,21 +528,48 @@ void Job::updateAverageRatio()
 
 void Job::copyToBestBrain(Brain * brain)
 {
-    mutexBestBrain.lock();
-    bestBrain.id = 0;
-    bestBrain.inputCount = brain->inputCount;
-    bestBrain.outputCount = brain->outputCount;
-    bestBrain.weights = brain->weights;
-    bestBrain.outputs = QVector<float>(brain->outputCount, 0.0f);
-    bestBrain.neurons = QVector<Neuron>();
-    bestBrain.inputs = QVector<float>(brain->inputCount, 0.0f);
-    bestBrain.neuronBlueprints = brain->neuronBlueprints;
-    bestBrain.results.clear();
-    bestBrain.score = brain->score;
-    bestBrain.attempts = brain->attempts;
-    bestBrain.balance = brain->balance;
-    bestBrain.ratio = brain->ratio;
-    mutexBestBrain.unlock();
+    if(brain->balance < bestBalanceEver - limitDeviation)
+    {
+        copyToBestBrain(&bestBrainEver);
+    }
+    else
+    {
+        mutexBestBrain.lock();
+        bestBrain.id = 0;
+        bestBrain.inputCount = brain->inputCount;
+        bestBrain.outputCount = brain->outputCount;
+        bestBrain.weights = brain->weights;
+        bestBrain.outputs = QVector<float>(brain->outputCount, 0.0f);
+        bestBrain.neurons = QVector<Neuron>();
+        bestBrain.inputs = QVector<float>(brain->inputCount, 0.0f);
+        bestBrain.neuronBlueprints = brain->neuronBlueprints;
+        bestBrain.results.clear();
+        bestBrain.score = brain->score;
+        bestBrain.attempts = brain->attempts;
+        bestBrain.balance = brain->balance;
+        bestBrain.ratio = brain->ratio;
+        mutexBestBrain.unlock();
+    }
+}
+
+
+void Job::copyToBestBrainEver(Brain * brain)
+{
+    mutexBestBrainEver.lock();
+    bestBrainEver.id = 0;
+    bestBrainEver.inputCount = brain->inputCount;
+    bestBrainEver.outputCount = brain->outputCount;
+    bestBrainEver.weights = brain->weights;
+    bestBrainEver.outputs = QVector<float>(brain->outputCount, 0.0f);
+    bestBrainEver.neurons = QVector<Neuron>();
+    bestBrainEver.inputs = QVector<float>(brain->inputCount, 0.0f);
+    bestBrainEver.neuronBlueprints = brain->neuronBlueprints;
+    bestBrainEver.results.clear();
+    bestBrainEver.score = brain->score;
+    bestBrainEver.attempts = brain->attempts;
+    bestBrainEver.balance = brain->balance;
+    bestBrainEver.ratio = brain->ratio;
+    mutexBestBrainEver.unlock();
 }
 
 
