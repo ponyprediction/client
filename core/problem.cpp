@@ -3,21 +3,26 @@
 #include <QXmlStreamReader>
 #include <QStringList>
 #include <QDebug>
+#include <QMap>
+#include <QJsonArray>
+#include <QJsonObject>
+
 
 Problem::Problem()
 {
-
 }
+
 
 Problem::Problem(const QJsonObject & json, const int & inputCount)
 {
     load(json, inputCount);
 }
 
+
 Problem::~Problem()
 {
-
 }
+
 
 void Problem::load(const QJsonObject & json, const int & inputCount)
 {
@@ -25,7 +30,6 @@ void Problem::load(const QJsonObject & json, const int & inputCount)
     wantedOutputs.clear();
     //
     QStringList inputsList = json["inputs"].toString().split(';');
-
     int inputsPerTeam = Util::getLineFromConf("inputsPerTeam").toInt();
     teamCount = inputsList.size() / inputsPerTeam;
 
@@ -43,10 +47,15 @@ void Problem::load(const QJsonObject & json, const int & inputCount)
     {
         wantedOutputs.push_back(wantedOutputsList[i].toInt());
     }
-    QStringList gainsList = json["gain"].toString().split(";");
-    for(int i = 0 ; i < gainsList.size() ; i++)
+    //
+    QJsonObject win = json["winnings"].toObject();
+    QJsonArray singleShow = win["singleShow"].toArray();
+    for(int i = 0 ; i< singleShow.size() ; i++)
     {
-        gains.push_back(gainsList[i].toFloat());
+        winnings.insert(singleShow[i].toObject()["id"].toString().toInt(),
+                singleShow[i].toObject()["winning"].toString().toDouble());
     }
+
+    qDebug() << winnings;
 }
 

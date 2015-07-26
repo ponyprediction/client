@@ -141,7 +141,7 @@ void Brain::learn()
     {
         learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
                         problems->at(currentProblemId)->getCount(),
-                        problems->at(currentProblemId)->getGains());
+                        problems->at(currentProblemId)->getWinnings());
         break;
     }
     default:
@@ -165,9 +165,10 @@ void Brain::learnSingleWin(const int & wantedResult)
 
 void Brain::learnSingleShow(const QVector<int> & wantedResults,
                             const int & count,
-                            const QVector<float> &gains)
+                            const QMap<int, float> & winnings)
 {
     attempts++;
+
     if(count > 7)
     {
         if(results[0] == wantedResults[0]
@@ -177,8 +178,10 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
             score += 1.0f;
             for(int i = 0; i < 3 ; i ++)
             {
-                if(results[0] == wantedResults[i])
-                    balance += gains[i];
+                if(results[0] == wantedResults[i] && winnings.contains(wantedResults[i]))
+                {
+                    balance += winnings[wantedResults[i]];
+                }
             }
         }
     }
@@ -190,8 +193,10 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
             score += 1.0f;
             for(int i = 0; i < 2 ; i ++)
             {
-                if(results[0] == wantedResults[i])
-                    balance += gains[i];
+                if(results[0] == wantedResults[i] && winnings.contains(wantedResults[i]))
+                {
+                    balance += winnings[wantedResults[i]];
+                }
             }
         }
     }
