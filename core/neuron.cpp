@@ -1,9 +1,10 @@
 #include "neuron.hpp"
+#include "util.hpp"
 #include <QDebug>
 #include <math.h>
 Neuron::Neuron()
 {
-
+    biasInputs.push_back(new float(1));
 }
 
 Neuron::~Neuron()
@@ -28,13 +29,22 @@ void Neuron::addWeight(float * weight)
 
 void Neuron::compute()
 {
+    bool ok = true;
     float absoluteWeight = 0.0f;
     output = 0.0f;
-    QVector<float*> inputs = externalInputs + neuronalInputs + brainalInputs;  
-    for(int i = 0 ; i < inputs.size() && i <weights.size(); i++)
+    QVector<float*> inputs = biasInputs + externalInputs + neuronalInputs + brainalInputs;
+    if(ok && inputs.size() != weights.size())
     {
-        output += (*inputs[i]) * (*weights[i]);
-        absoluteWeight += fabs(*weights[i]);
+        Util::writeError("Not same count of weights and inputs");
+        ok = false;
     }
-    output /= absoluteWeight;
+    if(ok)
+    {
+        for(int i = 0 ; i < inputs.size() && i < weights.size(); i++)
+        {
+            output += (*inputs[i]) * (*weights[i]);
+            absoluteWeight += fabs(*weights[i]);
+        }
+        output /= absoluteWeight;
+    }
 }

@@ -14,6 +14,7 @@ public:
     float getOutput(){return output;}
     float * getOutputAdress(){return &output;}
 private:
+    QVector<float *> biasInputs;
     QVector<float *> externalInputs;
     QVector<float *> neuronalInputs; // = outputs from neuron
     QVector<float *> brainalInputs; // = outputs from brain
