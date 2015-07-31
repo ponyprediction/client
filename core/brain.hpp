@@ -31,6 +31,7 @@ public:
     void start(QVector<Problem*> * problems);
     const float & getRatio(){return ratio;}
     const float & getBalance(){return balance;}
+    const float & getError(){return error;}
     const int & getId(){return id;}
     void mutate(float mutationFrequency, float mutationIntensity);
     QString getJson();
@@ -48,7 +49,7 @@ private:
     void learnSingleWin(const int & wantedResult);
     void learnSingleShow(const QVector<int> & wantedResults,
                          const int & count,
-                         const QMap<int, float> & winnings);
+                         const QMap<int, float> & winnings, const QVector<float> & targets);
 
     void autoEvaluate();
     void run();
@@ -81,6 +82,7 @@ private:
     float score;
     float ratio;
     float balance;
+    float error;
 
     QJsonObject json;
 

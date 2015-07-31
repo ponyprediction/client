@@ -14,8 +14,10 @@
 class Job : public QObject
 {
     Q_OBJECT
+
 public:
 
+    enum EvaluationMode {RATIO, BALANCE, ERROR};
 
     Job();
     Job(const QString & id,
@@ -66,10 +68,15 @@ public:
     float getLimitDeviation(){return limitDeviation;}
 
     float getBestRatio();
-    float getBestBalance();
-    float getBestBalanceEver();
-    float getAverageBalance();
     float getAverageRatio();
+    float getBestBalance();
+    float getAverageBalance();
+    float getBestError();
+    float getAverageError();
+
+    float getBestBalanceEver();
+    float getBestErrorEver();
+
     QString getBestBrain();
     void setBrain(const QString & brainJson);
 
@@ -79,9 +86,14 @@ private:
 
     void loadProblems(const QString & trainingSetJson, bool & ok);
     void loadBrains(const QString & brainJson, bool & ok);
+
     void addRatio(const float & ratio);
-    void addBalance(const float & balance);
     void updateAverageRatio();
+    void addBalance(const float & balance);
+    void updateAverageBalance();
+    void addError(const float & error);
+    void updateAverageError();
+
     void copyToBestBrain(Brain * brain);
     void copyFromBestBrain(Brain * brain);
     void copyToBestBrainEver(Brain * brain);
@@ -91,25 +103,42 @@ private:
     void upMutationIntenstity();
     void downMutationIntenstity();
 
+    void upMutation();
+     void downMutation();
+
     QString id;
     QVector<Problem*> problems;
     Brain bestBrain;
     Brain bestBrainEver;
     QVector<Brain*> brains;
     int brainCount;
-
-    int ratiosToSaveCount;
-    QVector<float> lastNratios;
-    QVector<float> lastNbalances;
-    float averageRatio;
-    float averageBalance;
-    float lastAverageRatio;
-    float lastAverageBalance;
-
-    QMutex mutexLastNratios;
-    QMutex mutexAverageRatio;
     QMutex mutexBestBrain;
     QMutex mutexBestBrainEver;
+
+    int infosToSaveCount;
+
+    QVector<float> lastNratios;
+    float averageRatio;
+    float lastAverageRatio;
+    QMutex mutexLastNratios;
+    QMutex mutexAverageRatio;
+    //float bestRatioEver;
+
+    QVector<float> lastNbalances;
+    float averageBalance;
+    float lastAverageBalance;
+    QMutex mutexLastNbalances;
+    QMutex mutexAverageBalance;
+    float bestBalanceEver;
+
+    QVector<float> lastNError;
+    float averageError;
+    float lastAverageError;
+    QMutex mutexLastNError;
+    QMutex mutexAverageError;
+    float bestErrorEver;
+
+
 
     QDateTime session;
     QString saveDirectory;
@@ -130,9 +159,8 @@ private:
 
     float limitDeviation;
 
-    //float bestRatioEver;
-    float bestBalanceEver;
-
     Brain::Mode mode;
+
+    EvaluationMode evaluationMode;
 
 };

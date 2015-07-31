@@ -2,30 +2,37 @@
 #include "util.hpp"
 #include <QDebug>
 #include <math.h>
-Neuron::Neuron()
+
+
+Neuron::Neuron() :
+    inOutputLayer(false)
 {
     biasInputs.push_back(new float(1));
 }
 
+
 Neuron::~Neuron()
 {
-
 }
+
 
 void Neuron::addExternalInput(float * input)
 {
     externalInputs.push_back(input);
 }
 
+
 void Neuron::addNeuronalInput(float * input)
 {
     neuronalInputs.push_back(input);
 }
 
+
 void Neuron::addWeight(float * weight)
 {
     weights.push_back(weight);
 }
+
 
 void Neuron::compute()
 {
@@ -40,11 +47,27 @@ void Neuron::compute()
     }
     if(ok)
     {
+        float x;
         for(int i = 0 ; i < inputs.size() && i < weights.size(); i++)
         {
-            output += (*inputs[i]) * (*weights[i]);
+            x += (*inputs[i]) * (*weights[i]);
             absoluteWeight += fabs(*weights[i]);
         }
-        output /= absoluteWeight;
+        if(absoluteWeight)
+        {
+            output = x / absoluteWeight;
+        }
+        else
+        {
+            output = 0;
+        }
+        if(output > 1)
+        {
+            output = 1;
+        }
+        if(output < -1)
+        {
+            output = -1;
+        }
     }
 }
