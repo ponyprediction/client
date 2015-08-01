@@ -192,11 +192,6 @@ void MainWindow::onRefresh()
                 QString::number(job->getAverageBalance(), 'f', 6));
     controlForm.ui->labelBestBalanceValue->setText(
                 QString::number(job->getBestBalanceEver(), 'f', 6));
-    // Error
-    controlForm.ui->labelError->setText(
-                QString::number(job->getBestError(), 'f', 1));
-    controlForm.ui->labelAverageError->setText(
-                QString::number(job->getAverageError(), 'f', 1));
 }
 
 

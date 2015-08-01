@@ -18,7 +18,6 @@ public:
     const int & getWantedOutput(){return wantedOutputs[0];}
     const QVector<int> & getWantedOutputs(){return wantedOutputs;}
     const int & getCount(){return teamCount;}
-    const QVector<float> & getTargets(){return targets;}
 
 private:
 
@@ -26,7 +25,6 @@ private:
     QVector<float> inputs;
     QVector<int> wantedOutputs;
     QMap<int, float> winnings;
-    QVector<float> targets;
     int teamCount;
 
 };

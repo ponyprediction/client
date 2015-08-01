@@ -22,9 +22,9 @@ Brain::Brain() :
     attempts(0.0f),
     score(0.0f),
     ratio(0.0f),
-    balance(-999999),
-    error(999999),
-    json()
+    json(),
+    balance(-7000)
+
 {
 
 }
@@ -62,10 +62,6 @@ void Brain::run()
     //
     qsrand(seed);
 
-    error = 0;
-    ratio = 0;
-    balance = 0;
-
     while(go)
     {
         compute(problems->at(currentProblemId)->getInputs());
@@ -73,7 +69,7 @@ void Brain::run()
         learn();
         //
         currentProblemId++;
-        currentProblemId %= problems->size();
+        currentProblemId%=problems->size();
         if(!currentProblemId)
         {
             job->evaluate(this);
@@ -136,23 +132,22 @@ void Brain::learn()
 {
     switch(mode)
     {
-        case SINGLE_WIN:
-        {
-            learnSingleWin(problems->at(currentProblemId)->getWantedOutput());
-            break;
-        }
-        case SINGLE_SHOW:
-        {
-            learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
-                            problems->at(currentProblemId)->getCount(),
-                            problems->at(currentProblemId)->getWinnings(),
-                            problems->at(currentProblemId)->getTargets());
-            break;
-        }
-        default:
-        {
-            Util::writeError("invalide mode in brain");
-        }
+    case SINGLE_WIN:
+    {
+        learnSingleWin(problems->at(currentProblemId)->getWantedOutput());
+        break;
+    }
+    case SINGLE_SHOW:
+    {
+        learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
+                        problems->at(currentProblemId)->getCount(),
+                        problems->at(currentProblemId)->getWinnings());
+        break;
+    }
+    default:
+    {
+        Util::writeError("invalide mode in brain");
+    }
     }
 }
 
@@ -170,57 +165,43 @@ void Brain::learnSingleWin(const int & wantedResult)
 
 void Brain::learnSingleShow(const QVector<int> & wantedResults,
                             const int & count,
-                            const QMap<int, float> & winnings,
-                            const QVector<float> & targets)
+                            const QMap<int, float> & winnings)
 {
-    if(count <= 7)
+    attempts++;
+
+    if(count > 7)
     {
-        for(int id = 0 ; id < 1 ; id++)
+        if(results[0] == wantedResults[0]
+                || results[0] == wantedResults[1]
+                || results[0] == wantedResults[2])
         {
-            balance--;
-            attempts++;
-            if(results[id] == wantedResults[0]
-                    || results[id] == wantedResults[1])
+            score += 1.0f;
+            for(int i = 0; i < 3 ; i ++)
             {
-                score += 1.0f;
-                for(int i = 0; i < 2 ; i ++)
+                if(results[0] == wantedResults[i] && winnings.contains(wantedResults[i]))
                 {
-                    if(results[id] == wantedResults[i] && winnings.contains(wantedResults[i]))
-                    {
-                        balance += winnings[wantedResults[i]];
-                    }
+                    balance += winnings[wantedResults[i]];
                 }
             }
         }
     }
     else
     {
-        for(int id = 0 ; id < 1 ; id++)
+        if(results[0] == wantedResults[0]
+                || results[0] == wantedResults[1])
         {
-            balance--;
-            attempts++;
-            if(results[id] == wantedResults[0]
-                    || results[id] == wantedResults[1]
-                    || results[id] == wantedResults[2])
+            score += 1.0f;
+            for(int i = 0; i < 2 ; i ++)
             {
-                score += 1.0f;
-                for(int i = 0; i < 3 ; i ++)
+                if(results[0] == wantedResults[i] && winnings.contains(wantedResults[i]))
                 {
-                    if(results[id] == wantedResults[i] && winnings.contains(wantedResults[i]))
-                    {
-                        balance += winnings[wantedResults[i]];
-                    }
+                    balance += winnings[wantedResults[i]];
                 }
             }
         }
     }
-
-
     ratio = score / (float)attempts;
-    for(int i = 0 ; i < outputCount ; i++)
-    {
-        error += fabs(outputs[i] - targets[i]);
-    }
+    balance--;
 }
 
 
@@ -266,14 +247,6 @@ QString Brain::getJson()
     if(ok)
     {
         json["ratio"] = ratio;
-    }
-    if(ok)
-    {
-        json["balance"] = balance;
-    }
-    if(ok)
-    {
-        json["error"] = error;
     }
     //
     if(ok)
@@ -366,14 +339,6 @@ void Brain::load(const QJsonObject & json)
     {
         ratio = json["ratio"].toDouble();
     }
-    if(ok)
-    {
-        balance = json["balance"].toDouble();
-    }
-    if(ok)
-    {
-        error = json["error"].toDouble();
-    }
 }
 
 void Brain::initNeurons()
@@ -388,24 +353,27 @@ void Brain::initNeurons()
     for(int i = 0 ; i < neurons.size() ; i++)
     {
         NeuronBlueprint blueprint = neuronBlueprints[i];
-        for(int j = 0 ; j < blueprint.externalInputIds.size() ; j++)
+        for(int j = 0 ;
+            j < blueprint.externalInputIds.size() ;
+            j++)
         {
             float * a = &inputs[blueprint.externalInputIds[j]];
             neurons[i].addExternalInput(a);
         }
-        for(int j = 0 ; j < blueprint.neuronalInputIds.size() ; j++)
+        for(int j = 0 ;
+            j < blueprint.neuronalInputIds.size() ;
+            j++)
         {
-            float * a = neurons[blueprint.neuronalInputIds[j]].getOutputAdress();
+            float * a =
+                    neurons[blueprint.neuronalInputIds[j]].getOutputAdress();
             neurons[i].addNeuronalInput(a);
         }
-        for(int j = 0 ; j < blueprint.weightIds.size() ; j++)
+        for(int j = 0 ;
+            j < blueprint.weightIds.size() ;
+            j++)
         {
             float * a = &weights[blueprint.weightIds[j]];
             neurons[i].addWeight(a);
-        }
-        if(i >= neurons.size() - outputCount)
-        {
-            neurons[i].setInOutputLayer(true);
         }
     }
 }
