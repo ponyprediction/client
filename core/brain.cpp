@@ -214,6 +214,8 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
             }
         }
     }
+
+
     ratio = score / (float)attempts;
     for(int i = 0 ; i < outputCount ; i++)
     {
