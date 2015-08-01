@@ -208,6 +208,7 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
         lastLayer.push_back(outputs[i]);
     //On les range par ordre croissant
     qSort(lastLayer);
+    lastLayer.reserve(lastLayer.size());
     //On met a jour les poids avec le delta
     for(int i = weightCount -20; i < weightCount; i++)
     {
