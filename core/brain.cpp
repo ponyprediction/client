@@ -212,6 +212,9 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
     for(int i = weightCount -20; i < weightCount; i++)
     {
         double delta = 0;
+        delta = (outputs[i] - (1/20)*lastLayer.indexOf(outputs[i]));
+        delta *= outputs[i];
+        delta *= 1-outputs[i];
         weights[i] += delta;
     }
 }
