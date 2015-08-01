@@ -202,6 +202,18 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
     }
     ratio = score / (float)attempts;
     balance--;
+    //ON recupere les 20 dernier ouputs
+    QVector<float> lastLayer;
+    for(int i = outputCount - 20; i < outputCount ; i++)
+        lastLayer.push_back(outputs[i]);
+    //On les range par ordre croissant
+    qSort(lastLayer);
+    //On met a jour les poids avec le delta
+    for(int i = weightCount -20; i < weightCount; i++)
+    {
+        double delta = 0;
+        weights[i] += delta;
+    }
 }
 
 

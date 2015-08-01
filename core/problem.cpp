@@ -55,7 +55,5 @@ void Problem::load(const QJsonObject & json, const int & inputCount)
         winnings.insert(singleShow[i].toObject()["id"].toString().toInt(),
                 singleShow[i].toObject()["winning"].toString().toDouble());
     }
-
-    qDebug() << winnings;
 }
 
