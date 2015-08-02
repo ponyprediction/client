@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QVector>
+#include <QString>
 
 class Neuron
 {
@@ -15,9 +16,8 @@ public:
     float * getOutputAdress(){return &output;}
     void backPropa(double target);
     double tsigmaK;
-    QVector<Neuron *> next;
     QVector<Neuron *> previous;
-    QVector<float*> nextWeights;
+    QString type;
 private:
     QVector<float *> externalInputs;
     QVector<float *> neuronalInputs; // = outputs from neuron

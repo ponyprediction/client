@@ -44,7 +44,7 @@ void Neuron::backPropa(double target)
 {
     tsigmaK = output*(1-output);
     float n = 1;
-    if(neuronalInputs.size() != 0 && externalInputs.size() == 0)
+    if(type == "O")
     {
         tsigmaK *= (output-target);
         for(int i = 0 ; i < neuronalInputs.size(); i++)
@@ -52,9 +52,5 @@ void Neuron::backPropa(double target)
             float delta = -n*tsigmaK*previous[i]->output;
             *weights[i] += delta;
         }
-    }
-    else
-    {
-
     }
 }

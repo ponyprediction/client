@@ -221,9 +221,6 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
     }
 
     //
-
-
-    //qDebug() << weights;
 }
 
 
@@ -375,6 +372,10 @@ void Brain::initNeurons()
     for(int i = 0 ; i < neurons.size() ; i++)
     {
         NeuronBlueprint blueprint = neuronBlueprints[i];
+        if(blueprint.neuronalInputIds.size() == 0)
+            neurons[i].type = "L";
+        else
+            neurons[i].type = "O";
         for(int j = 0 ;
             j < blueprint.externalInputIds.size() ;
             j++)
