@@ -235,7 +235,7 @@ void Job::evaluate(Brain * brain)
         saveBestBrain(fileName);
     }*/
     copyFromBestBrain(brain);
-    brain->mutate(mutationFrequency,mutationIntensity);
+    //brain->mutate(mutationFrequency,mutationIntensity);
 }
 
 

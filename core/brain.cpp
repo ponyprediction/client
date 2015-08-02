@@ -42,6 +42,7 @@ Brain::Brain(Job * job,
     this->mode = mode;
     load(json);
     initNeurons();
+
 }
 
 Brain::~Brain()
@@ -206,18 +207,18 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
     ratio = score / (float)attempts;
     balance--;
 
+
     int j = 0;
     for(int i = weightCount -20; i < weightCount; i++)
     {
         double delta = 0;
         delta = (outputs[j] - targets[j]);
-        //qDebug() << outputs;
         delta *= outputs[j];
         delta *= (1-outputs[j]);
         j++;
-       // qDebug() << delta;
         weights[i] += delta;
     }
+    qDebug() << weights;
 }
 
 
