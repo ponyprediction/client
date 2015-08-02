@@ -208,17 +208,22 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
     balance--;
 
 
-    int j = 0;
-    for(int i = weightCount -20; i < weightCount; i++)
+    //Update weight in the output layer
+    for(int i = neuronCount -20 ; i < neuronCount ; i++)
     {
-        double delta = 0;
-        delta = (outputs[j] - targets[j]);
-        delta *= outputs[j];
-        delta *= (1-outputs[j]);
-        j++;
-        weights[i] += delta;
+        neurons[i].backPropa(targets[i]);
     }
-    qDebug() << weights;
+    //Update weight in the hidden layer
+    double sumTsigmaK = 0;
+    for(int i = 0; i < 20 ; i++)
+    {
+        sumTsigmaK += neurons[i].tsigmaK*1;
+    }
+
+    //
+
+
+    //qDebug() << weights;
 }
 
 
@@ -384,6 +389,7 @@ void Brain::initNeurons()
             float * a =
                     neurons[blueprint.neuronalInputIds[j]].getOutputAdress();
             neurons[i].addNeuronalInput(a);
+            neurons[i].previous.push_back(&neurons[blueprint.neuronalInputIds[j]]);
         }
         for(int j = 0 ;
             j < blueprint.weightIds.size() ;
