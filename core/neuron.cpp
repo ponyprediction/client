@@ -36,6 +36,6 @@ void Neuron::compute()
         output += (*inputs[i]) * (*weights[i]);
         //absoluteWeight += fabs(*weights[i]);
     }
-    output = 1/(1+exp(output);
+    output = 1/(1+exp(output));
     //output /= absoluteWeight;
 }
