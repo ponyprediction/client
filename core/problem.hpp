@@ -14,6 +14,7 @@ public:
     Problem(const QJsonObject & json, const int & inputCount);
     ~Problem();
     const QVector<float> & getInputs(){return inputs;}
+    const QVector<float> & getTargets(){return targets;}
     const QMap<int, float> getWinnings(){return winnings;}
     const int & getWantedOutput(){return wantedOutputs[0];}
     const QVector<int> & getWantedOutputs(){return wantedOutputs;}
@@ -23,9 +24,11 @@ private:
 
     void load(const QJsonObject & json, const int & inputCount);
     QVector<float> inputs;
+    QVector<float> targets;
     QVector<int> wantedOutputs;
     QMap<int, float> winnings;
     int teamCount;
+
 
 };
 
