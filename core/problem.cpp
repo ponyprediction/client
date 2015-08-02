@@ -49,9 +49,9 @@ void Problem::load(const QJsonObject & json, const int & inputCount)
     }
     //
     QStringList targetOutputsList = json["targets"].toString().split(';');
-    for(int i = 0 ; i < wantedOutputsList.size() ; i++)
+    for(int i = 0 ; i < targetOutputsList.size() ; i++)
     {
-        targets.push_back(wantedOutputsList[i].toFloat());
+        targets.push_back(targetOutputsList[i].toFloat());
     }
     //
     QJsonObject win = json["winnings"].toObject();

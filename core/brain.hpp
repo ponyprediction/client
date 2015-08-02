@@ -48,7 +48,8 @@ private:
     void learnSingleWin(const int & wantedResult);
     void learnSingleShow(const QVector<int> & wantedResults,
                          const int & count,
-                         const QMap<int, float> & winnings);
+                         const QMap<int, float> & winnings,
+                         const QVector<float> & targets);
 
     void autoEvaluate();
     void run();

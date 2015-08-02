@@ -97,6 +97,7 @@ void Brain::compute(const QVector<float> & inputs)
         int i2 = (neurons.size() - outputs.size()) + i;
         outputs[i] = neurons[i2].getOutput();
     }
+
 }
 
 
@@ -141,7 +142,8 @@ void Brain::learn()
     {
         learnSingleShow(problems->at(currentProblemId)->getWantedOutputs(),
                         problems->at(currentProblemId)->getCount(),
-                        problems->at(currentProblemId)->getWinnings());
+                        problems->at(currentProblemId)->getWinnings(),
+                        problems->at(currentProblemId)->getTargets());
         break;
     }
     default:
@@ -165,7 +167,8 @@ void Brain::learnSingleWin(const int & wantedResult)
 
 void Brain::learnSingleShow(const QVector<int> & wantedResults,
                             const int & count,
-                            const QMap<int, float> & winnings)
+                            const QMap<int, float> & winnings,
+                            const QVector<float> &targets)
 {
     attempts++;
 
@@ -202,20 +205,17 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
     }
     ratio = score / (float)attempts;
     balance--;
-    //ON recupere les 20 dernier ouputs
-    QVector<float> lastLayer;
-    for(int i = outputCount - 20; i < outputCount ; i++)
-        lastLayer.push_back(outputs[i]);
-    //On les range par ordre croissant
-    qSort(lastLayer);
-    lastLayer.reserve(lastLayer.size());
-    //On met a jour les poids avec le delta
+
+    int j = 0;
     for(int i = weightCount -20; i < weightCount; i++)
     {
         double delta = 0;
-        delta = (outputs[i] - (1/20)*lastLayer.indexOf(outputs[i]));
-        delta *= outputs[i];
-        delta *= 1-outputs[i];
+        delta = (outputs[j] - targets[j]);
+        //qDebug() << outputs;
+        delta *= outputs[j];
+        delta *= (1-outputs[j]);
+        j++;
+       // qDebug() << delta;
         weights[i] += delta;
     }
 }
