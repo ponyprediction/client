@@ -22,8 +22,8 @@ Brain::Brain() :
     attempts(0.0f),
     score(0.0f),
     ratio(0.0f),
-    json(),
-    balance(-7000)
+    balance(-7000),
+    json()
 
 {
 
@@ -214,10 +214,17 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
         neurons[i].backPropa(targets[i]);
     }
     //Update weight in the hidden layer
-    double sumTsigmaK = 0;
-    for(int i = 0; i < 20 ; i++)
+    for(int i = 0 ; i < neuronCount -20 ; i++)
     {
-        sumTsigmaK += neurons[i].tsigmaK*1;
+        neurons[i].backPropa(targets[i]);
+    }
+    for(int i = 0 ; i < weightCount ; i++)
+    {
+        if(weights[i] > 1.0f)
+            weights[i] = 1.0f;
+        if(weights[i] < -1.0f)
+            weights[i] = -1.0f;
+
     }
 
     //
@@ -373,7 +380,7 @@ void Brain::initNeurons()
     {
         NeuronBlueprint blueprint = neuronBlueprints[i];
         if(blueprint.neuronalInputIds.size() == 0)
-            neurons[i].type = "L";
+            neurons[i].type = "H";
         else
             neurons[i].type = "O";
         for(int j = 0 ;
@@ -390,7 +397,9 @@ void Brain::initNeurons()
             float * a =
                     neurons[blueprint.neuronalInputIds[j]].getOutputAdress();
             neurons[i].addNeuronalInput(a);
-            neurons[i].previous.push_back(&neurons[blueprint.neuronalInputIds[j]]);
+            neurons[i].previous.push_back(
+                        &neurons[blueprint.neuronalInputIds[j]]);
+            neurons[i].previous[j]->tsigmaKP.push_back(&neurons[blueprint.neuronalInputIds[j]].tsigmaK);
         }
         for(int j = 0 ;
             j < blueprint.weightIds.size() ;
@@ -398,6 +407,10 @@ void Brain::initNeurons()
         {
             float * a = &weights[blueprint.weightIds[j]];
             neurons[i].addWeight(a);
+            if(neurons[i].type == "O" && j < blueprint.weightIds.size()-1)
+            {
+                neurons[i].previous[j]->weightsP.push_back(a);
+            }
         }
     }
 }

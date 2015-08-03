@@ -53,4 +53,17 @@ void Neuron::backPropa(double target)
             *weights[i] += delta;
         }
     }
+    else if(type == "H")
+    {
+        double sum = 0;
+        for(int i = 0 ; i < tsigmaKP.size() ; i ++)
+        {
+            sum += *tsigmaKP[i]**weightsP[i];
+        }
+        float delta = -n*tsigmaK*sum*output;
+        for(int i = 0; i < weights.size() ; i++)
+        {
+            *weights[i] += delta;
+        }
+    }
 }

@@ -15,8 +15,10 @@ public:
     float getOutput(){return output;}
     float * getOutputAdress(){return &output;}
     void backPropa(double target);
-    double tsigmaK;
+    float tsigmaK;
     QVector<Neuron *> previous;
+    QVector<float *> weightsP;
+    QVector<float *> tsigmaKP;
     QString type;
 private:
     QVector<float *> externalInputs;
