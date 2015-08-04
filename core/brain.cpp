@@ -209,53 +209,44 @@ void Brain::learnSingleShow(const QVector<int> & wantedResults,
     }
     ratio = score / (float)attempts;
     balance--;
-    for(int i = 0 ; i < neuronCount ; i ++)
-    {
-        if(neurons[i].type == "O")
-        {
-
-        }
-    }
-
-
-    //Update weight in the output layer
-
-    //Update weight in the hidden layer
-
 
     int target = 0;
-    for(int i = 0 ; i < connection.size(); i++)
+    for(int i = 0 ; i < connections.size(); i++)
     {
         if(target/20 == 1)
             target = 0;
         float tsigmaK = 0;
-        float n = 1;
-        tsigmaK = connection[i]->next->output*(1-connection[i]->next->output);
-        tsigmaK *= targets[i];
-        for(int j = 0 ; j < connection[i]->next->weights.size(); j++)
+        float n = 0.2;
+        tsigmaK = connections[i]->next->output*(1-connections[i]->next->output);
+        tsigmaK *= (connections[i]->next->output-targets[target]);
+
+        for(int j = 0 ; j < connections[i]->next->weights.size(); j++)
         {
-            float delta = -n*tsigmaK*connection[i]->previous->output;
-            connection[i]->next->tsigmaK = tsigmaK;
-            *connection[i]->next->weights[j] += delta;
+            float delta = 0;
+            delta = -n*tsigmaK*connections[i]->previous->output;
+            connections[i]->next->tsigmaK = tsigmaK;
+            *connections[i]->next->weights[j] = *connections[i]->next->weights[j]+delta;
         }
         tsigmaK = 0;
-        tsigmaK = connection[i]->previous->output*(1-connection[i]->previous->output);
+        tsigmaK = connections[i]->previous->output*(1-connections[i]->previous->output);
         float sum = 0;
-        for(int j = 0 ; j < connection.size(); j++)
+        for(int j = 0 ; j < connections.size(); j++)
         {
-            if(connection[i]->previous == connection[j]->previous)
+            if(connections[i]->previous == connections[j]->previous)
             {
-                sum += connection[j]->next->tsigmaK**connection[j]->weights;
+                sum += connections[j]->next->tsigmaK**connections[j]->weights;
             }
         }
         tsigmaK*=sum;
-        for(int j = 0 ; j < connection[i]->previous->weights.size(); j++)
+        for(int j = 0 ; j < connections[i]->previous->weights.size(); j++)
         {
-            float delta = -n*tsigmaK*connection[i]->previous->output;
-            *connection[i]->previous->weights[j] += delta;
+            float delta = -n*tsigmaK*connections[i]->previous->output;
+            *connections[i]->previous->weights[j] = *connections[i]->next->weights[j]+delta;
         }
         target++;
     }
+
+
     for(int i = 0 ; i < weightCount ; i++)
     {
         if(weights[i] > 1.0f)
@@ -408,7 +399,7 @@ void Brain::initNeurons()
 {
     //
     neurons.clear();
-    connection.clear();
+    connections.clear();
     for(int i = 0 ; i < neuronCount ; i++)
     {
         neurons.push_back(Neuron());
@@ -439,7 +430,7 @@ void Brain::initNeurons()
             aa->next = &neurons[i];
             aa->previous = &neurons[blueprint.neuronalInputIds[j]];
             aa->weights = &weights[blueprint.weightIds[j]];
-            connection.push_back(aa);
+            connections.push_back(aa);
         }
         for(int j = 0 ;
             j < blueprint.weightIds.size() ;
