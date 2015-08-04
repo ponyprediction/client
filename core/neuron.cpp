@@ -3,7 +3,7 @@
 #include <math.h>
 Neuron::Neuron()
 {
-
+    tsigmaK = 0;
 }
 
 Neuron::~Neuron()
@@ -28,7 +28,7 @@ void Neuron::addWeight(float * weight)
 
 void Neuron::compute()
 {
-    float absoluteWeight = 0.0f;
+    //float absoluteWeight = 0.0f;
     output = 0.0f;
     QVector<float*> inputs = externalInputs + neuronalInputs + brainalInputs;
     for(int i = 0 ; i < inputs.size() && i <weights.size(); i++)
@@ -38,32 +38,4 @@ void Neuron::compute()
     }
     output = 1/(1+exp(output));
     //output /= absoluteWeight;
-}
-
-void Neuron::backPropa(double target)
-{
-    tsigmaK = output*(1-output);
-    float n = 1;
-    if(type == "O")
-    {
-        tsigmaK *= (output-target);
-        for(int i = 0 ; i < neuronalInputs.size(); i++)
-        {
-            float delta = -n*tsigmaK*previous[i]->output;
-            *weights[i] += delta;
-        }
-    }
-    else if(type == "H")
-    {
-        double sum = 0;
-        for(int i = 0 ; i < tsigmaKP.size() ; i ++)
-        {
-            sum += *tsigmaKP[i]**weightsP[i];
-        }
-        float delta = -n*tsigmaK*sum*output;
-        for(int i = 0; i < weights.size() ; i++)
-        {
-            *weights[i] += delta;
-        }
-    }
 }

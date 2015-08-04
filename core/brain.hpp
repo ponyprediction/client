@@ -7,6 +7,7 @@
 #include <QThread>
 #include <QVector>
 #include <QThread>
+#include "core/connection.hpp"
 
 class Job;
 
@@ -38,6 +39,7 @@ public:
     QString getPrediction(const QVector<float> & inputs);
 
     void stop();
+    QVector<Connection*> connections;
 
 private:
 

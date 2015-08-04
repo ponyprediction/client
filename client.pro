@@ -25,7 +25,8 @@ SOURCES += main.cpp\
     core/neuron.cpp \
     core/neuron-blueprint.cpp \
     ui/control-form.cpp \
-    ui/local-form.cpp
+    ui/local-form.cpp \
+    core/connection.cpp
 
 HEADERS  += ui/main-window.hpp \
     ui/connection-form.hpp \
@@ -38,7 +39,8 @@ HEADERS  += ui/main-window.hpp \
     core/neuron.hpp \
     core/neuron-blueprint.hpp \
     ui/control-form.hpp \
-    ui/local-form.hpp
+    ui/local-form.hpp \
+    core/connection.hpp
 
 FORMS    += ui/main-window.ui \
     ui/connection-form.ui \
